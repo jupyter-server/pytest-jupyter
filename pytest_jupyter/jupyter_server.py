@@ -1,6 +1,7 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
+import nbformat
 import os
 import json
 import pytest
@@ -18,37 +19,51 @@ from jupyter_server.serverapp import ServerApp
 from jupyter_server.utils import url_path_join
 from jupyter_server.services.contents.filemanager import FileContentsManager
 
-import nbformat
 
-# This shouldn't be needed anymore, since pytest_tornasync is found in entrypoints
-pytest_plugins = "pytest_tornasync"
+from .utils import mkdir
 
 # NOTE: This is a temporary fix for Windows 3.8
 # We have to override the io_loop fixture with an
 # asyncio patch. This will probably be removed in
 # the future.
-
 @pytest.fixture
 def jp_asyncio_patch():
+    """Appropriately configures the event loop policy if running on Windows w/ Python >= 3.8."""
     ServerApp()._init_asyncio_patch()
+
 
 @pytest.fixture
 def io_loop(jp_asyncio_patch):
+    """Returns an ioloop instance that includes the asyncio patch for Windows 3.8 platforms."""
     loop = tornado.ioloop.IOLoop()
     loop.make_current()
     yield loop
     loop.clear_current()
     loop.close(all_fds=True)
 
-jp_server_config = pytest.fixture(lambda: {})
 
-some_resource = u"The very model of a modern major general"
-sample_kernel_json = {
-    'argv':['cat', '{connection_file}'],
-    'display_name': 'Test kernel',
-}
-jp_argv = pytest.fixture(lambda: [])
+@pytest.fixture
+def jp_server_config():
+    """Allows tests to setup their specific configuration values. """
+    return {}
 
+
+@pytest.fixture
+def jp_root_dir(tmp_path):
+    """Provides a temporary Jupyter root directory value."""
+    return mkdir(tmp_path, "root_dir")
+
+
+@pytest.fixture
+def jp_template_dir(tmp_path):
+    """Provides a temporary Jupyter templates directory value."""
+    return mkdir(tmp_path, "templates")
+
+
+@pytest.fixture
+def jp_argv():
+    """Allows tests to setup specific argv values. """
+    return []
 
 
 @pytest.fixture
@@ -59,6 +74,7 @@ def jp_extension_environ(jp_env_config_path, monkeypatch):
 
 @pytest.fixture
 def jp_http_port(http_server_port):
+    """Returns the port value from the http_server_port fixture. """
     return http_server_port[-1]
 
 
@@ -72,6 +88,7 @@ def jp_configurable_serverapp(
     jp_root_dir,
     io_loop,
 ):
+    """Starts a Jupyter Server instance based on the provided configuration values."""
     ServerApp.clear_instance()
 
     def _configurable_serverapp(
@@ -117,6 +134,7 @@ def jp_configurable_serverapp(
 
 @pytest.fixture(scope="function")
 def jp_serverapp(jp_server_config, jp_argv, jp_configurable_serverapp):
+    """Starts a Jupyter Server instance based on the established configuration values."""
     app = jp_configurable_serverapp(config=jp_server_config, argv=jp_argv)
     yield app
     app.remove_server_info_file()
@@ -132,17 +150,19 @@ def app(jp_serverapp):
 
 @pytest.fixture
 def jp_auth_header(jp_serverapp):
+    """Configures an authorization header using the token from the serverapp fixture."""
     return {"Authorization": "token {token}".format(token=jp_serverapp.token)}
 
 
 @pytest.fixture
 def jp_base_url():
+    """Returns the base url to use for the test."""
     return "/"
 
 
 @pytest.fixture
 def jp_fetch(http_server_client, jp_auth_header, jp_base_url):
-    """fetch fixture that handles auth, base_url, and path"""
+    """Performs an HTTP request against the test server."""
     def client_fetch(*parts, headers={}, params={}, **kwargs):
         # Handle URL strings
         path_url = url_escape(url_path_join(jp_base_url, *parts), plus=False)
@@ -159,7 +179,7 @@ def jp_fetch(http_server_client, jp_auth_header, jp_base_url):
 
 @pytest.fixture
 def jp_ws_fetch(jp_auth_header, jp_http_port):
-    """websocket fetch fixture that handles auth, base_url, and path"""
+    """Performs a websocket request against the test server."""
     def client_fetch(*parts, headers={}, params={}, **kwargs):
         # Handle URL strings
         path = url_escape(url_path_join(*parts), plus=False)
@@ -181,8 +201,14 @@ def jp_ws_fetch(jp_auth_header, jp_http_port):
     return client_fetch
 
 
+some_resource = u"The very model of a modern major general"
+sample_kernel_json = {
+    'argv':['cat', '{connection_file}'],
+    'display_name': 'Test kernel',
+}
 @pytest.fixture
 def jp_kernelspecs(jp_data_dir):
+    """Configures some sample kernelspecs in the Jupyter data directory."""
     spec_names = ['sample', 'sample 2']
     for name in spec_names:
         sample_kernel_dir = jp_data_dir.joinpath('kernels', name)
@@ -196,13 +222,14 @@ def jp_kernelspecs(jp_data_dir):
 
 
 @pytest.fixture(params=[True, False])
-def jp_contents_manager(request, tmp_path):
-    return FileContentsManager(root_dir=str(tmp_path), use_atomic_writing=request.param)
+def jp_contents_manager(request, jp_root_dir):
+    """Returns a FileContentsManager instance based on the use_atomic_writing parameter value."""
+    return FileContentsManager(root_dir=jp_root_dir, use_atomic_writing=request.param)
 
 
 @pytest.fixture
 def jp_create_notebook(jp_root_dir):
-    """Create a notebook in the test's home directory."""
+    """Creates a notebook in the test's home directory."""
     def inner(nbpath):
         nbpath = jp_root_dir.joinpath(nbpath)
         # Check that the notebook has the correct file extension.
