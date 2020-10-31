@@ -1,24 +1,22 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
+import jupyter_core.paths
 import nbformat
 import os
 import json
 import pytest
+import shutil
+import tornado
+import urllib.parse
 
 from binascii import hexlify
-
-import urllib.parse
-import tornado
-from tornado.escape import url_escape
-
-from traitlets.config import Config
-
 from jupyter_server.extension import serverextension
 from jupyter_server.serverapp import ServerApp
 from jupyter_server.utils import url_path_join
 from jupyter_server.services.contents.filemanager import FileContentsManager
-
+from tornado.escape import url_escape
+from traitlets.config import Config
 
 from .utils import mkdir
 
@@ -78,8 +76,29 @@ def jp_http_port(http_server_port):
     return http_server_port[-1]
 
 
+@pytest.fixture
+def jp_setup_templates(jp_data_dir):
+    """Setups up a temporary directory consisting of the nbconvert templates."""
+
+    # Get path to nbconvert template directory *before*
+    # monkeypatching the paths env variable via the jp_environ fixture.
+    possible_paths = jupyter_core.paths.jupyter_path('nbconvert', 'templates')
+    nbconvert_path = None
+    for path in possible_paths:
+        if os.path.exists(path):
+            nbconvert_path = path
+            break
+
+    nbconvert_target = jp_data_dir / 'nbconvert' / 'templates'
+
+    # copy nbconvert templates to new tmp data_dir.
+    if nbconvert_path:
+        shutil.copytree(nbconvert_path, str(nbconvert_target))
+
+
 @pytest.fixture(scope='function')
 def jp_configurable_serverapp(
+    jp_setup_templates,  # this fixture must preceed jp_environ
     jp_environ,
     jp_server_config,
     jp_argv,
