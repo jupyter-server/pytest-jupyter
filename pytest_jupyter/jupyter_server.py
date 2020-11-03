@@ -77,7 +77,7 @@ def jp_http_port(http_server_port):
 
 
 @pytest.fixture
-def jp_setup_templates(jp_data_dir):
+def jp_nbconvert_templates(jp_data_dir):
     """Setups up a temporary directory consisting of the nbconvert templates."""
 
     # Get path to nbconvert template directory *before*
@@ -98,7 +98,7 @@ def jp_setup_templates(jp_data_dir):
 
 @pytest.fixture(scope='function')
 def jp_configurable_serverapp(
-    jp_setup_templates,  # this fixture must preceed jp_environ
+    jp_nbconvert_templates,  # this fixture must preceed jp_environ
     jp_environ,
     jp_server_config,
     jp_argv,
