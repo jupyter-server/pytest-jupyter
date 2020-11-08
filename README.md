@@ -1,3 +1,3 @@
 # pytest-jupyter
 
-A pytest plugin for testing Jupyter core libraries and extensions.
+A set of pytest plugins for Jupyter libraries and extensions.

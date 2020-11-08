@@ -107,7 +107,20 @@ def jp_configurable_serverapp(
     jp_root_dir,
     io_loop,
 ):
-    """Starts a Jupyter Server instance based on the provided configuration values."""
+    """Starts a Jupyter Server instance based on
+    the provided configuration values.
+
+    The fixture is a factory; it can be called like
+    a function inside a unit test. Here's a basic
+    example of how use this fixture:
+
+    .. code-block:: python
+
+        def my_test(jp_configurable_serverapp):
+
+            app = jp_configurable_serverapp(...)
+            ...
+    """
     ServerApp.clear_instance()
 
     def _configurable_serverapp(
@@ -262,3 +275,4 @@ def jp_create_notebook(jp_root_dir):
         nbtext = nbformat.writes(nb, version=4)
         nbpath.write_text(nbtext)
     return inner
+
