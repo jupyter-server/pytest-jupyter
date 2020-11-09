@@ -254,9 +254,9 @@ def jp_kernelspecs(jp_data_dir):
 
 
 @pytest.fixture(params=[True, False])
-def jp_contents_manager(request, jp_root_dir):
+def jp_contents_manager(request, tmp_path):
     """Returns a FileContentsManager instance based on the use_atomic_writing parameter value."""
-    return FileContentsManager(root_dir=str(jp_root_dir), use_atomic_writing=request.param)
+    return FileContentsManager(root_dir=str(tmp_path), use_atomic_writing=request.param)
 
 
 @pytest.fixture
