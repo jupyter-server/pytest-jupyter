@@ -15,6 +15,7 @@ from jupyter_server.extension import serverextension
 from jupyter_server.serverapp import ServerApp
 from jupyter_server.utils import url_path_join
 from jupyter_server.services.contents.filemanager import FileContentsManager
+from jupyter_server.services.contents.largefilemanager import LargeFileManager
 from tornado.escape import url_escape
 from traitlets.config import Config
 
@@ -254,9 +255,15 @@ def jp_kernelspecs(jp_data_dir):
 
 
 @pytest.fixture(params=[True, False])
-def jp_contents_manager(request, jp_root_dir):
+def jp_contents_manager(request, tmp_path):
     """Returns a FileContentsManager instance based on the use_atomic_writing parameter value."""
-    return FileContentsManager(root_dir=str(jp_root_dir), use_atomic_writing=request.param)
+    return FileContentsManager(root_dir=str(tmp_path), use_atomic_writing=request.param)
+
+
+@pytest.fixture
+def jp_large_contents_manager(tmp_path):
+    """Returns a LargeFileManager instance."""
+    return LargeFileManager(root_dir=str(tmp_path))
 
 
 @pytest.fixture
