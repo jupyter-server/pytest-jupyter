@@ -195,7 +195,19 @@ def jp_base_url():
 
 @pytest.fixture
 def jp_fetch(http_server_client, jp_auth_header, jp_base_url):
-    """Performs an HTTP request against the test server."""
+    """Sends an (asynchronous) HTTP request to a test server.
+
+    The fixture is a factory; it can be called like
+    a function inside a unit test. Here's a basic
+    example of how use this fixture:
+
+    .. code-block:: python
+
+        async def my_test(jp_fetch):
+
+            response = await jp_fetch("api", "spec.yaml")
+            ...
+    """
     def client_fetch(*parts, headers={}, params={}, **kwargs):
         # Handle URL strings
         path_url = url_escape(url_path_join(jp_base_url, *parts), plus=False)
@@ -212,7 +224,31 @@ def jp_fetch(http_server_client, jp_auth_header, jp_base_url):
 
 @pytest.fixture
 def jp_ws_fetch(jp_auth_header, jp_http_port):
-    """Performs a websocket request against the test server."""
+    """Sends a websocket request to a test server.
+
+    The fixture is a factory; it can be called like
+    a function inside a unit test. Here's a basic
+    example of how use this fixture:
+
+    .. code-block:: python
+
+        async def my_test(jp_fetch, jp_ws_fetch):
+            # Start a kernel
+            r = await jp_fetch(
+                'api', 'kernels',
+                method='POST',
+                body=json.dumps({
+                    'name': "python3"
+                })
+            )
+            kid = json.loads(r.body.decode())['id']
+
+            # Open a websocket connection.
+            ws = await jp_ws_fetch(
+                'api', 'kernels', kid, 'channels'
+            )
+            ...
+    """
     def client_fetch(*parts, headers={}, params={}, **kwargs):
         # Handle URL strings
         path = url_escape(url_path_join(*parts), plus=False)
