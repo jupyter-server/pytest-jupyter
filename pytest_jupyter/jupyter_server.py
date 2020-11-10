@@ -165,8 +165,36 @@ def jp_configurable_serverapp(
     return _configurable_serverapp
 
 
+@pytest.fixture
+def jp_ensure_app_fixture(request):
+    """Ensures that the 'app' fixture used by pytest-tornasync
+    is set to `jp_web_app`, the Tornado Web Application returned
+    by the ServerApp in Jupyter Server, provided by the jp_web_app
+    fixture in this module.
+
+    Note, this hardcodes the `app_fixture` option from
+    pytest-tornasync to `jp_web_app`. If this value is configured
+    to something other than the default, it will raise an exception.
+    """
+    app_option = request.config.getoption("app_fixture")
+    if app_option not in ["app", "jp_web_app"]:
+        raise Exception("jp_serverapp requires the `app-fixture` option "
+                        "to be set to 'jp_web_app`. Try rerunning the "
+                        "current tests with the option `--app-fixture "
+                        "jp_web_app`.")
+    elif app_option == "app":
+        # Manually set the app_fixture to `jp_web_app` if it's
+        # not set already.
+        request.config.option.app_fixture = "jp_web_app"
+
+
 @pytest.fixture(scope="function")
-def jp_serverapp(jp_server_config, jp_argv, jp_configurable_serverapp):
+def jp_serverapp(
+    jp_ensure_app_fixture,
+    jp_server_config,
+    jp_argv,
+    jp_configurable_serverapp
+):
     """Starts a Jupyter Server instance based on the established configuration values."""
     app = jp_configurable_serverapp(config=jp_server_config, argv=jp_argv)
     yield app
@@ -176,7 +204,7 @@ def jp_serverapp(jp_server_config, jp_argv, jp_configurable_serverapp):
 
 
 @pytest.fixture
-def app(jp_serverapp):
+def jp_web_app(jp_serverapp):
     """app fixture is needed by pytest_tornasync plugin"""
     return jp_serverapp.web_app
 
@@ -194,7 +222,7 @@ def jp_base_url():
 
 
 @pytest.fixture
-def jp_fetch(http_server_client, jp_auth_header, jp_base_url):
+def jp_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_base_url):
     """Performs an HTTP request against the test server."""
     def client_fetch(*parts, headers={}, params={}, **kwargs):
         # Handle URL strings
@@ -211,7 +239,7 @@ def jp_fetch(http_server_client, jp_auth_header, jp_base_url):
 
 
 @pytest.fixture
-def jp_ws_fetch(jp_auth_header, jp_http_port):
+def jp_ws_fetch(jp_serverapp, jp_auth_header, jp_http_port):
     """Performs a websocket request against the test server."""
     def client_fetch(*parts, headers={}, params={}, **kwargs):
         # Handle URL strings
