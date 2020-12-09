@@ -160,7 +160,6 @@ def jp_configurable_serverapp(
         c = Config(config)
         c.NotebookNotary.db_file = ":memory:"
         token = hexlify(os.urandom(4)).decode("ascii")
-        url_prefix = "/"
         app = ServerApp.instance(
             # Set the log level to debug for testing purposes
             log_level='DEBUG',
@@ -168,7 +167,7 @@ def jp_configurable_serverapp(
             port_retries=0,
             open_browser=False,
             root_dir=str(root_dir),
-            base_url=url_prefix,
+            base_url=base_url,
             config=c,
             allow_root=True,
             token=token,
@@ -262,9 +261,10 @@ def jp_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_base_url):
     """
     def client_fetch(*parts, headers={}, params={}, **kwargs):
         # Handle URL strings
-        path_url = url_escape(url_path_join(jp_base_url, *parts), plus=False)
+        path_url = url_escape(url_path_join(*parts), plus=False)
+        base_path_url = url_path_join(jp_base_url, path_url)
         params_url = urllib.parse.urlencode(params)
-        url = path_url + "?" + params_url
+        url = base_path_url + "?" + params_url
         # Add auth keys to header
         headers.update(jp_auth_header)
         # Make request.
@@ -275,7 +275,7 @@ def jp_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_base_url):
 
 
 @pytest.fixture
-def jp_ws_fetch(jp_serverapp, jp_auth_header, jp_http_port):
+def jp_ws_fetch(jp_serverapp, jp_auth_header, jp_http_port, jp_base_url):
     """Sends a websocket request to a test server.
 
     The fixture is a factory; it can be called like
@@ -303,10 +303,11 @@ def jp_ws_fetch(jp_serverapp, jp_auth_header, jp_http_port):
     """
     def client_fetch(*parts, headers={}, params={}, **kwargs):
         # Handle URL strings
-        path = url_escape(url_path_join(*parts), plus=False)
+        path_url = url_escape(url_path_join(*parts), plus=False)
+        base_path_url = url_path_join(jp_base_url, path_url)
         urlparts = urllib.parse.urlparse('ws://localhost:{}'.format(jp_http_port))
         urlparts = urlparts._replace(
-            path=path,
+            path=base_path_url,
             query=urllib.parse.urlencode(params)
         )
         url = urlparts.geturl()
