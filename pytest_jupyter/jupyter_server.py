@@ -104,6 +104,7 @@ def jp_configurable_serverapp(
     jp_server_config,
     jp_argv,
     jp_http_port,
+    jp_base_url,
     tmp_path,
     jp_root_dir,
     io_loop,
@@ -126,6 +127,7 @@ def jp_configurable_serverapp(
 
     def _configurable_serverapp(
         config=jp_server_config,
+        base_url=jp_base_url,
         argv=jp_argv,
         environ=jp_environ,
         http_port=jp_http_port,
@@ -218,7 +220,7 @@ def jp_auth_header(jp_serverapp):
 @pytest.fixture
 def jp_base_url():
     """Returns the base url to use for the test."""
-    return "/"
+    return "/a%40b/"
 
 
 @pytest.fixture
@@ -346,4 +348,3 @@ def jp_create_notebook(jp_root_dir):
         nbtext = nbformat.writes(nb, version=4)
         nbpath.write_text(nbtext)
     return inner
-
