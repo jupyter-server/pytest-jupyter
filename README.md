@@ -8,7 +8,7 @@ First, install `pytest-jupyter` from PyPI using pip:
 ```bash
 pip install pytest-jupyter
 ```
-This installs the basic pytest-jupyter package that insludes fixture definitions for the various Jupyter-based pytest plugins.
+This installs the basic pytest-jupyter package that includes fixture definitions for the various Jupyter-based pytest plugins.
 
 To use one of these plugins, you'll also need to install their dependencies. This requires a second `pip install` call. For example, if you'd like to use the `jupyter_server` plugin, you'll need to call:
 ```bash
