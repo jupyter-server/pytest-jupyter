@@ -1,25 +1,47 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-import jupyter_core.paths
-import nbformat
 import os
 import json
 import pytest
 import shutil
-import tornado
 import urllib.parse
 
 from binascii import hexlify
-from jupyter_server.extension import serverextension
-from jupyter_server.serverapp import ServerApp
-from jupyter_server.utils import url_path_join
-from jupyter_server.services.contents.filemanager import FileContentsManager
-from jupyter_server.services.contents.largefilemanager import LargeFileManager
-from tornado.escape import url_escape
-from traitlets.config import Config
+
+# The try block is needed so that the documentation can
+# still build without needed to install all the dependencies.
+try:
+    import tornado
+    from tornado.escape import url_escape
+    import jupyter_core.paths
+    import nbformat
+    from traitlets.config import Config
+
+    from jupyter_server.extension import serverextension
+    from jupyter_server.serverapp import ServerApp
+    from jupyter_server.utils import url_path_join
+    from jupyter_server.services.contents.filemanager import FileContentsManager
+    from jupyter_server.services.contents.largefilemanager import LargeFileManager
+
+except (ModuleNotFoundError, ImportError) as e:
+    import warnings
+    warnings.warn(
+        "The server plugin has not been installed. "
+        "If you're trying to use this plugin and you've installed "
+        "`pytest-jupyter`, there is likely one more step "
+        "you need. Try: `pip install 'pytest-jupyter[server]'`"
+    )
+
 
 from .utils import mkdir
+
+# List of dependencies needed for this plugin.
+pytest_plugins = [
+    "pytest_tornasync",
+    "pytest_jupyter.jupyter_core"
+]
+
 
 # NOTE: This is a temporary fix for Windows 3.8
 # We have to override the io_loop fixture with an

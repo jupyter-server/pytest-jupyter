@@ -1,13 +1,25 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
-
-import jupyter_core.paths
 import os
 import pytest
 import sys
 
-from .utils import mkdir
+# The try block is needed so that the documentation can
+# still build without needed to install all the dependencies.
+try:
+    import jupyter_core.paths
 
+except (ModuleNotFoundError, ImportError) as e:
+    import warnings
+    warnings.warn(
+        "The jupyter_core plugin has not been installed. "
+        "If you're trying to use this plugin and you've installed "
+        "`pytest-jupyter`, there is likely one more step "
+        "you need. Try: `pip install 'pytest-jupyter[core]'`"
+    )
+
+
+from .utils import mkdir
 
 @pytest.fixture
 def jp_home_dir(tmp_path):
