@@ -24,22 +24,25 @@ classifiers = [
 ]
 dependencies = [
     "pytest",
+    "pytest-asyncio",
+    "jupyter_core"
 ]
 
 [project.optional-dependencies]
-core = [
-    "jupyter_core",
-]
 docs = [
     "myst_parser",
     "pydata_sphinx_theme",
     "Sphinx",
 ]
+client = [
+    "jupyter_client"
+]
 server = [
-    "jupyter_core",
     "jupyter_server",
     "nbformat",
-    "pytest-tornasync",
+]
+test = [
+    "pytest-timeout"
 ]
 
 [project.urls]

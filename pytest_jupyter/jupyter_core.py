@@ -3,23 +3,8 @@
 import os
 import sys
 
+import jupyter_core
 import pytest
-
-# The try block is needed so that the documentation can
-# still build without needed to install all the dependencies.
-try:
-    import jupyter_core.paths
-
-except ImportError:
-    import warnings
-
-    warnings.warn(
-        "The jupyter_core plugin has not been installed. "
-        "If you're trying to use this plugin and you've installed "
-        "`pytest-jupyter`, there is likely one more step "
-        "you need. Try: `pip install 'pytest-jupyter[core]'`"
-    )
-
 
 from .utils import mkdir
 
