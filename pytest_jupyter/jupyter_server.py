@@ -205,10 +205,12 @@ def jp_configurable_serverapp(
     The fixture is a factory; it can be called like
     a function inside a unit test. Here's a basic
     example of how use this fixture:
+
     .. code-block:: python
-        def my_test(jp_configurable_serverapp):
-            app = jp_configurable_serverapp(...)
-            ...
+
+      def my_test(jp_configurable_serverapp):
+         app = jp_configurable_serverapp(...)
+         ...
     """
     ServerApp.clear_instance()
 
@@ -307,7 +309,9 @@ def jp_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_base_url):
     The fixture is a factory; it can be called like
     a function inside a unit test. Here's a basic
     example of how use this fixture:
+
     .. code-block:: python
+
         async def my_test(jp_fetch):
             response = await jp_fetch("api", "spec.yaml")
             ...
@@ -338,7 +342,9 @@ def jp_ws_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_http_port, 
     The fixture is a factory; it can be called like
     a function inside a unit test. Here's a basic
     example of how use this fixture:
+
     .. code-block:: python
+
         async def my_test(jp_fetch, jp_ws_fetch):
             # Start a kernel
             r = await jp_fetch(
