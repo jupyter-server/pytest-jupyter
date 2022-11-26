@@ -1,20 +1,14 @@
-# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
-
-name: Python package
-
+name: Tests
 on:
   push:
+    branches: ["main"]
   pull_request:
   schedule:
     - cron: "0 8 * * *"
 
-concurrency:
-  group: >-
-    ${{ github.workflow }}-
-    ${{ github.ref_type }}-
-    ${{ github.event.pull_request.number || github.sha }}
-  cancel-in-progress: true
+defaults:
+  run:
+    shell: bash -eux {0}
 
 jobs:
   build:
@@ -23,62 +17,49 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: ["3.7", "3.10"]
+        python-version: ["3.8", "3.11"]
         include:
           - os: windows-latest
             python-version: "3.9"
           - os: ubuntu-latest
             python-version: "pypy-3.8"
           - os: macos-latest
-            python-version: "3.8"
+            python-version: "3.10"
     steps:
       - uses: actions/checkout@v2
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
-      - name: Install dependencies
+      - name: Run the tests
+        run: hatch run cov:test || hatch run test:test --lf
+      - name: Coverage
         run: |
-          pip install -e ".[test]"
-      - name: Test with pytest
-        run: |
-          python -m pytest -vv --timeout 60 --cov jupyter_core --cov-report term-missing:skip-covered
-      - name: Check CLI
-        run: |
-          cd $HOME
-          jupyter troubleshoot
+          pip install codecov coverage[toml]
+          codecov
 
-  test_miniumum_versions:
+  test_minimum_versions:
     name: Test Minimum Versions
+    timeout-minutes: 20
     runs-on: ubuntu-latest
-    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v2
-      - name: Base Setup
-        uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+      - uses: actions/checkout@v3
+      - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
         with:
-          python_version: "3.7"
-      - name: Install miniumum versions
-        uses: jupyterlab/maintainer-tools/.github/actions/install-minimums@v1
+          dependency_type: minimum
       - name: Run the unit tests
-        run: pytest -vv -W default || pytest -vv -W default --lf
+        run: |
+          hatch run test:nowarn || hatch run test:nowarn --lf
 
   test_prereleases:
     name: Test Prereleases
-    timeout-minutes: 10
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Base Setup
-        uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
-      - name: Install the Python dependencies
-        run: |
-          pip install --upgrade --upgrade-strategy eager --pre -e ".[test]"
-      - name: List installed packages
-        run: |
-          pip freeze
-          pip check
+      - uses: actions/checkout@v3
+      - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+        with:
+          dependency_type: pre
       - name: Run the tests
         run: |
-          pytest -vv || pytest -vv --lf
+          hatch run test:nowarn || hatch run test:nowarn --lf
 
   make_sdist:
     name: Make SDist
@@ -103,17 +84,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-      - uses: pre-commit/action@v2.0.0
-        with:
-          extra_args: --all-files --hook-stage=manual
-      - name: Help message if pre-commit fail
-        if: ${{ failure() }}
-        run: |
-          echo "You can install pre-commit hooks to automatically run formatting"
-          echo "on each commit with:"
-          echo "    pre-commit install"
-          echo "or you can run by hand on staged files with"
-          echo "    pre-commit run"
-          echo "or after-the-fact on already committed files with"
-          echo "    pre-commit run --all-files --hook-stage=manual"
+      - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+      - uses: jupyterlab/maintainer-tools/.github/actions/pre-commit@v1

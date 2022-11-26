@@ -27,6 +27,8 @@ dependencies = [
     "pytest-asyncio",
     "jupyter_core"
 ]
+requires-python = ">=3.8"
+
 
 [project.optional-dependencies]
 docs = [
