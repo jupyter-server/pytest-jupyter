@@ -42,8 +42,10 @@ client = [
 server = [
     "jupyter_server",
     "nbformat",
+    "pytest-tornasync"
 ]
 test = [
+    "pytest-jupyter[server]",
     "pytest-timeout"
 ]
 
@@ -74,7 +76,7 @@ nowarn = "test -W default {args}"
 features = ["test"]
 dependencies = ["coverage", "pytest-cov"]
 [tool.hatch.envs.cov.scripts]
-test = "python -m pytest -vv --cov pytest-jupyter --cov-branch --cov-report term-missing:skip-covered {args}"
+test = "python -m pytest -vv --cov pytest_jupyter --cov-branch --cov-report term-missing:skip-covered {args}"
 nowarn = "test -W default {args}"
 
 [tool.pytest.ini_options]
@@ -104,6 +106,20 @@ exclude_lines = [
   "class .*\bProtocol\\):",
   "@(abc\\.)?abstractmethod",
 ]
+
+[tool.mypy]
+check_untyped_defs = true
+disallow_incomplete_defs = true
+no_implicit_optional = true
+pretty = true
+show_error_context = true
+show_error_codes = true
+strict_equality = true
+warn_unused_configs = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+explicit_package_bases = true
+namespace_packages = true
 
 [tool.flake8]
 ignore = "E501, W503, E402"

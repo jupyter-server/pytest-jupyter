@@ -1,26 +1,37 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
+import asyncio
+import importlib
+import io
 import json
+import logging
 import os
+import re
 import shutil
 import urllib.parse
 from binascii import hexlify
+from contextlib import closing
 
+import jupyter_core.paths
 import pytest
 
 # The try block is needed so that the documentation can
 # still build without needed to install all the dependencies.
 try:
-    import jupyter_core.paths
     import nbformat
     import tornado
+    import tornado.testing
+    from jupyter_server.auth import Authorizer
     from jupyter_server.extension import serverextension
-    from jupyter_server.serverapp import ServerApp
-    from jupyter_server.services.contents.filemanager import FileContentsManager
-    from jupyter_server.services.contents.largefilemanager import LargeFileManager
+    from jupyter_server.serverapp import JUPYTER_SERVICE_HANDLERS, ServerApp
+    from jupyter_server.services.contents.filemanager import AsyncFileContentsManager
+    from jupyter_server.services.contents.largefilemanager import AsyncLargeFileManager
     from jupyter_server.utils import url_path_join
+    from pytest_tornasync.plugin import AsyncHTTPServerClient
     from tornado.escape import url_escape
+    from tornado.httpclient import HTTPClientError
+    from tornado.websocket import WebSocketHandler
     from traitlets.config import Config
 
 except ImportError:
@@ -37,7 +48,7 @@ except ImportError:
 from .utils import mkdir
 
 # List of dependencies needed for this plugin.
-pytest_plugins = ["pytest_tornasync", "pytest_jupyter.jupyter_core"]
+pytest_plugins = ["pytest_tornasync", "pytest_jupyter"]
 
 
 # NOTE: This is a temporary fix for Windows 3.8
@@ -51,19 +62,62 @@ def jp_asyncio_patch():
 
 
 @pytest.fixture
-def io_loop(jp_asyncio_patch):
-    """Returns an ioloop instance that includes the asyncio patch for Windows 3.8 platforms."""
-    loop = tornado.ioloop.IOLoop()
-    loop.make_current()
+def asyncio_loop():
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
     yield loop
-    loop.clear_current()
-    loop.close(all_fds=True)
+    loop.close()
+
+
+@pytest.fixture(autouse=True)
+def io_loop(asyncio_loop):
+    async def get_tornado_loop():
+        return tornado.ioloop.IOLoop.current()
+
+    return asyncio_loop.run_until_complete(get_tornado_loop())
+
+
+@pytest.fixture
+def http_server_client(http_server, io_loop):
+    """
+    Create an asynchronous HTTP client that can fetch from `http_server`.
+    """
+
+    async def get_client():
+        return AsyncHTTPServerClient(http_server=http_server)
+
+    client = io_loop.run_sync(get_client)
+    with closing(client) as context:
+        yield context
+
+
+@pytest.fixture
+def http_server(io_loop, http_server_port, jp_web_app):
+    """Start a tornado HTTP server that listens on all available interfaces."""
+
+    async def get_server():
+        server = tornado.httpserver.HTTPServer(jp_web_app)
+        server.add_socket(http_server_port[0])
+        return server
+
+    server = io_loop.run_sync(get_server)
+    yield server
+    server.stop()
+
+    if hasattr(server, "close_all_connections"):
+        io_loop.run_sync(server.close_all_connections)
+
+    http_server_port[0].close()
 
 
 @pytest.fixture
 def jp_server_config():
     """Allows tests to setup their specific configuration values."""
-    return {}
+    return Config(
+        {
+            "jpserver_extensions": {"jupyter_server_terminals": True},
+        }
+    )
 
 
 @pytest.fixture
@@ -93,7 +147,8 @@ def jp_extension_environ(jp_env_config_path, monkeypatch):
 @pytest.fixture
 def jp_http_port(http_server_port):
     """Returns the port value from the http_server_port fixture."""
-    return http_server_port[-1]
+    yield http_server_port[-1]
+    http_server_port[0].close()
 
 
 @pytest.fixture
@@ -116,6 +171,22 @@ def jp_nbconvert_templates(jp_data_dir):
         shutil.copytree(nbconvert_path, str(nbconvert_target))
 
 
+@pytest.fixture
+def jp_logging_stream():
+    """StringIO stream intended to be used by the core
+    Jupyter ServerApp logger's default StreamHandler. This
+    helps avoid collision with stdout which is hijacked
+    by Pytest.
+    """
+    logging_stream = io.StringIO()
+    yield logging_stream
+    output = logging_stream.getvalue()
+    # If output exists, print it.
+    if output:
+        print(output)
+    return output
+
+
 @pytest.fixture(scope="function")
 def jp_configurable_serverapp(
     jp_nbconvert_templates,  # this fixture must preceed jp_environ
@@ -126,23 +197,29 @@ def jp_configurable_serverapp(
     jp_base_url,
     tmp_path,
     jp_root_dir,
-    io_loop,
+    jp_logging_stream,
+    asyncio_loop,
 ):
     """Starts a Jupyter Server instance based on
     the provided configuration values.
-
     The fixture is a factory; it can be called like
     a function inside a unit test. Here's a basic
     example of how use this fixture:
 
     .. code-block:: python
 
-        def my_test(jp_configurable_serverapp):
-
-            app = jp_configurable_serverapp(...)
-            ...
+      def my_test(jp_configurable_serverapp):
+         app = jp_configurable_serverapp(...)
+         ...
     """
     ServerApp.clear_instance()
+
+    # Inject jupyter_server_terminals into config unless it was
+    # explicitly put in config.
+    serverapp_config = jp_server_config.setdefault("ServerApp", {})
+    exts = serverapp_config.setdefault("jpserver_extensions", {})
+    if "jupyter_server_terminals" not in exts:
+        exts["jupyter_server_terminals"] = True
 
     def _configurable_serverapp(
         config=jp_server_config,
@@ -156,18 +233,24 @@ def jp_configurable_serverapp(
     ):
         c = Config(config)
         c.NotebookNotary.db_file = ":memory:"
-        token = hexlify(os.urandom(4)).decode("ascii")
+        if "token" not in c.ServerApp and not c.IdentityProvider.token:
+            token = hexlify(os.urandom(4)).decode("ascii")
+            c.IdentityProvider.token = token
+
+        # Allow tests to configure root_dir via a file, argv, or its
+        # default (cwd) by specifying a value of None.
+        if root_dir is not None:
+            kwargs["root_dir"] = str(root_dir)
+
         app = ServerApp.instance(
             # Set the log level to debug for testing purposes
             log_level="DEBUG",
             port=http_port,
             port_retries=0,
             open_browser=False,
-            root_dir=str(root_dir),
             base_url=base_url,
             config=c,
             allow_root=True,
-            token=token,
             **kwargs,
         )
 
@@ -175,49 +258,31 @@ def jp_configurable_serverapp(
         app.log.propagate = True
         app.log.handlers = []
         # Initialize app without httpserver
-        app.initialize(argv=argv, new_httpserver=False)
+        if asyncio_loop.is_running():
+            app.initialize(argv=argv, new_httpserver=False)
+        else:
+
+            async def initialize_app():
+                app.initialize(argv=argv, new_httpserver=False)
+
+            asyncio_loop.run_until_complete(initialize_app())
+        # Reroute all logging StreamHandlers away from stdin/stdout since pytest hijacks
+        # these streams and closes them at unfortunate times.
+        stream_handlers = [h for h in app.log.handlers if isinstance(h, logging.StreamHandler)]
+        for handler in stream_handlers:
+            handler.setStream(jp_logging_stream)
         app.log.propagate = True
         app.log.handlers = []
-        # Start app without ioloop
         app.start_app()
         return app
 
     return _configurable_serverapp
 
 
-@pytest.fixture
-def jp_ensure_app_fixture(request):
-    """Ensures that the 'app' fixture used by pytest-tornasync
-    is set to `jp_web_app`, the Tornado Web Application returned
-    by the ServerApp in Jupyter Server, provided by the jp_web_app
-    fixture in this module.
-
-    Note, this hardcodes the `app_fixture` option from
-    pytest-tornasync to `jp_web_app`. If this value is configured
-    to something other than the default, it will raise an exception.
-    """
-    app_option = request.config.getoption("app_fixture")
-    if app_option not in ["app", "jp_web_app"]:
-        raise Exception(
-            "jp_serverapp requires the `app-fixture` option "
-            "to be set to 'jp_web_app`. Try rerunning the "
-            "current tests with the option `--app-fixture "
-            "jp_web_app`."
-        )
-    elif app_option == "app":
-        # Manually set the app_fixture to `jp_web_app` if it's
-        # not set already.
-        request.config.option.app_fixture = "jp_web_app"
-
-
 @pytest.fixture(scope="function")
-def jp_serverapp(jp_ensure_app_fixture, jp_server_config, jp_argv, jp_configurable_serverapp):
+def jp_serverapp(jp_server_config, jp_argv, jp_configurable_serverapp):
     """Starts a Jupyter Server instance based on the established configuration values."""
-    app = jp_configurable_serverapp(config=jp_server_config, argv=jp_argv)
-    yield app
-    app.remove_server_info_file()
-    app.remove_browser_open_file()
-    app.cleanup_kernels()
+    return jp_configurable_serverapp(config=jp_server_config, argv=jp_argv)
 
 
 @pytest.fixture
@@ -229,7 +294,7 @@ def jp_web_app(jp_serverapp):
 @pytest.fixture
 def jp_auth_header(jp_serverapp):
     """Configures an authorization header using the token from the serverapp fixture."""
-    return {"Authorization": f"token {jp_serverapp.token}"}
+    return {"Authorization": f"token {jp_serverapp.identity_provider.token}"}
 
 
 @pytest.fixture
@@ -241,7 +306,6 @@ def jp_base_url():
 @pytest.fixture
 def jp_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_base_url):
     """Sends an (asynchronous) HTTP request to a test server.
-
     The fixture is a factory; it can be called like
     a function inside a unit test. Here's a basic
     example of how use this fixture:
@@ -249,21 +313,23 @@ def jp_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_base_url):
     .. code-block:: python
 
         async def my_test(jp_fetch):
-
             response = await jp_fetch("api", "spec.yaml")
             ...
     """
 
     def client_fetch(*parts, headers=None, params=None, **kwargs):
+        if not headers:
+            headers = {}
+        if not params:
+            params = {}
         # Handle URL strings
-        headers = headers or {}
-        params = params or {}
         path_url = url_escape(url_path_join(*parts), plus=False)
         base_path_url = url_path_join(jp_base_url, path_url)
         params_url = urllib.parse.urlencode(params)
         url = base_path_url + "?" + params_url
-        # Add auth keys to header
-        headers.update(jp_auth_header)
+        # Add auth keys to header, if not overridden
+        for key, value in jp_auth_header.items():
+            headers.setdefault(key, value)
         # Make request.
         return http_server_client.fetch(url, headers=headers, request_timeout=20, **kwargs)
 
@@ -271,9 +337,8 @@ def jp_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_base_url):
 
 
 @pytest.fixture
-def jp_ws_fetch(jp_serverapp, jp_auth_header, jp_http_port, jp_base_url):
+def jp_ws_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_http_port, jp_base_url):
     """Sends a websocket request to a test server.
-
     The fixture is a factory; it can be called like
     a function inside a unit test. Here's a basic
     example of how use this fixture:
@@ -290,7 +355,6 @@ def jp_ws_fetch(jp_serverapp, jp_auth_header, jp_http_port, jp_base_url):
                 })
             )
             kid = json.loads(r.body.decode())['id']
-
             # Open a websocket connection.
             ws = await jp_ws_fetch(
                 'api', 'kernels', kid, 'channels'
@@ -299,9 +363,11 @@ def jp_ws_fetch(jp_serverapp, jp_auth_header, jp_http_port, jp_base_url):
     """
 
     def client_fetch(*parts, headers=None, params=None, **kwargs):
+        if not headers:
+            headers = {}
+        if not params:
+            params = {}
         # Handle URL strings
-        headers = headers or {}
-        params = params or {}
         path_url = url_escape(url_path_join(*parts), plus=False)
         base_path_url = url_path_join(jp_base_url, path_url)
         urlparts = urllib.parse.urlparse(f"ws://localhost:{jp_http_port}")
@@ -310,7 +376,7 @@ def jp_ws_fetch(jp_serverapp, jp_auth_header, jp_http_port, jp_base_url):
         # Add auth keys to header
         headers.update(jp_auth_header)
         # Make request.
-        req = tornado.httpclient.HTTPRequest(url, headers=jp_auth_header, connect_timeout=120)
+        req = tornado.httpclient.HTTPRequest(url, headers=headers, connect_timeout=120)
         return tornado.websocket.websocket_connect(req)
 
     return client_fetch
@@ -326,13 +392,16 @@ sample_kernel_json = {
 @pytest.fixture
 def jp_kernelspecs(jp_data_dir):
     """Configures some sample kernelspecs in the Jupyter data directory."""
-    spec_names = ["sample", "sample 2"]
+    spec_names = ["sample", "sample2", "bad"]
     for name in spec_names:
         sample_kernel_dir = jp_data_dir.joinpath("kernels", name)
         sample_kernel_dir.mkdir(parents=True)
         # Create kernel json file
         sample_kernel_file = sample_kernel_dir.joinpath("kernel.json")
-        sample_kernel_file.write_text(json.dumps(sample_kernel_json))
+        kernel_json = sample_kernel_json.copy()
+        if name == "bad":
+            kernel_json["argv"] = ["non_existent_path"]
+        sample_kernel_file.write_text(json.dumps(kernel_json))
         # Create resources text
         sample_kernel_resources = sample_kernel_dir.joinpath("resource.txt")
         sample_kernel_resources.write_text(some_resource)
@@ -340,14 +409,14 @@ def jp_kernelspecs(jp_data_dir):
 
 @pytest.fixture(params=[True, False])
 def jp_contents_manager(request, tmp_path):
-    """Returns a FileContentsManager instance based on the use_atomic_writing parameter value."""
-    return FileContentsManager(root_dir=str(tmp_path), use_atomic_writing=request.param)
+    """Returns an AsyncFileContentsManager instance based on the use_atomic_writing parameter value."""
+    return AsyncFileContentsManager(root_dir=str(tmp_path), use_atomic_writing=request.param)
 
 
 @pytest.fixture
 def jp_large_contents_manager(tmp_path):
-    """Returns a LargeFileManager instance."""
-    return LargeFileManager(root_dir=str(tmp_path))
+    """Returns an AsyncLargeFileManager instance."""
+    return AsyncLargeFileManager(root_dir=str(tmp_path))
 
 
 @pytest.fixture
@@ -368,3 +437,132 @@ def jp_create_notebook(jp_root_dir):
         nbpath.write_text(nbtext)
 
     return inner
+
+
+@pytest.fixture(autouse=True)
+def jp_server_cleanup(asyncio_loop):
+    yield
+    app: ServerApp = ServerApp.instance()
+    try:
+        asyncio_loop.run_until_complete(app._cleanup())
+    except (RuntimeError, SystemExit) as e:
+        print("ignoring cleanup error", e)
+    ServerApp.clear_instance()
+
+
+@pytest.fixture
+def send_request(jp_fetch, jp_ws_fetch):
+    """Send to Jupyter Server and return response code."""
+
+    async def _(url, **fetch_kwargs):
+        if url.endswith("channels") or "/websocket/" in url:
+            fetch = jp_ws_fetch
+        else:
+            fetch = jp_fetch
+
+        try:
+            r = await fetch(url, **fetch_kwargs, allow_nonstandard_methods=True)
+            code = r.code
+        except HTTPClientError as err:
+            code = err.code
+        else:
+            if fetch is jp_ws_fetch:
+                r.close()
+
+        return code
+
+    return _
+
+
+@pytest.fixture
+def jp_server_auth_core_resources():
+    modules = []
+    for mod_name in JUPYTER_SERVICE_HANDLERS.values():
+        if mod_name:
+            modules.extend(mod_name)
+    resource_map = {}
+    for handler_module in modules:
+        mod = importlib.import_module(handler_module)
+        name = mod.AUTH_RESOURCE
+        for handler in mod.default_handlers:
+            url_regex = handler[0]
+            resource_map[url_regex] = name
+    return resource_map
+
+
+@pytest.fixture
+def jp_server_auth_resources(jp_server_auth_core_resources):
+    return jp_server_auth_core_resources
+
+
+@pytest.fixture
+def jp_server_authorizer(jp_server_auth_resources):
+    class _(Authorizer):
+
+        # Set these class attributes from within a test
+        # to verify that they match the arguments passed
+        # by the REST API.
+        permissions: dict = {}
+
+        HTTP_METHOD_TO_AUTH_ACTION = {
+            "GET": "read",
+            "HEAD": "read",
+            "OPTIONS": "read",
+            "POST": "write",
+            "PUT": "write",
+            "PATCH": "write",
+            "DELETE": "write",
+            "WEBSOCKET": "execute",
+        }
+
+        def match_url_to_resource(self, url, regex_mapping=None):
+            """Finds the JupyterHandler regex pattern that would
+            match the given URL and returns the resource name (str)
+            of that handler.
+            e.g.
+            /api/contents/... returns "contents"
+            """
+            if not regex_mapping:
+                regex_mapping = jp_server_auth_resources
+            for regex, auth_resource in regex_mapping.items():
+                pattern = re.compile(regex)
+                if pattern.fullmatch(url):
+                    return auth_resource
+
+        def normalize_url(self, path):
+            """Drop the base URL and make sure path leads with a /"""
+            base_url = self.parent.base_url
+            # Remove base_url
+            if path.startswith(base_url):
+                path = path[len(base_url) :]
+            # Make sure path starts with /
+            if not path.startswith("/"):
+                path = "/" + path
+            return path
+
+        def is_authorized(self, handler, user, action, resource):
+            # Parse Request
+            if isinstance(handler, WebSocketHandler):
+                method = "WEBSOCKET"
+            else:
+                method = handler.request.method
+            url = self.normalize_url(handler.request.path)
+
+            # Map request parts to expected action and resource.
+            expected_action = self.HTTP_METHOD_TO_AUTH_ACTION[method]
+            expected_resource = self.match_url_to_resource(url)
+
+            # Assert that authorization layer returns the
+            # correct action + resource.
+            assert action == expected_action
+            assert resource == expected_resource
+
+            # Now, actually apply the authorization layer.
+            return all(
+                [
+                    action in self.permissions.get("actions", []),
+                    resource in self.permissions.get("resources", []),
+                ]
+            )
+
+    return _
