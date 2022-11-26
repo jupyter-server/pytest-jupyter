@@ -1,31 +1,31 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-import os
 import json
-import pytest
+import os
 import shutil
 import urllib.parse
-
 from binascii import hexlify
+
+import pytest
 
 # The try block is needed so that the documentation can
 # still build without needed to install all the dependencies.
 try:
-    import tornado
-    from tornado.escape import url_escape
     import jupyter_core.paths
     import nbformat
-    from traitlets.config import Config
-
+    import tornado
     from jupyter_server.extension import serverextension
     from jupyter_server.serverapp import ServerApp
-    from jupyter_server.utils import url_path_join
     from jupyter_server.services.contents.filemanager import FileContentsManager
     from jupyter_server.services.contents.largefilemanager import LargeFileManager
+    from jupyter_server.utils import url_path_join
+    from tornado.escape import url_escape
+    from traitlets.config import Config
 
-except (ModuleNotFoundError, ImportError) as e:
+except ImportError:
     import warnings
+
     warnings.warn(
         "The server plugin has not been installed. "
         "If you're trying to use this plugin and you've installed "
@@ -37,10 +37,7 @@ except (ModuleNotFoundError, ImportError) as e:
 from .utils import mkdir
 
 # List of dependencies needed for this plugin.
-pytest_plugins = [
-    "pytest_tornasync",
-    "pytest_jupyter.jupyter_core"
-]
+pytest_plugins = ["pytest_tornasync", "pytest_jupyter.jupyter_core"]
 
 
 # NOTE: This is a temporary fix for Windows 3.8
@@ -65,7 +62,7 @@ def io_loop(jp_asyncio_patch):
 
 @pytest.fixture
 def jp_server_config():
-    """Allows tests to setup their specific configuration values. """
+    """Allows tests to setup their specific configuration values."""
     return {}
 
 
@@ -83,7 +80,7 @@ def jp_template_dir(tmp_path):
 
 @pytest.fixture
 def jp_argv():
-    """Allows tests to setup specific argv values. """
+    """Allows tests to setup specific argv values."""
     return []
 
 
@@ -95,7 +92,7 @@ def jp_extension_environ(jp_env_config_path, monkeypatch):
 
 @pytest.fixture
 def jp_http_port(http_server_port):
-    """Returns the port value from the http_server_port fixture. """
+    """Returns the port value from the http_server_port fixture."""
     return http_server_port[-1]
 
 
@@ -105,21 +102,21 @@ def jp_nbconvert_templates(jp_data_dir):
 
     # Get path to nbconvert template directory *before*
     # monkeypatching the paths env variable via the jp_environ fixture.
-    possible_paths = jupyter_core.paths.jupyter_path('nbconvert', 'templates')
+    possible_paths = jupyter_core.paths.jupyter_path("nbconvert", "templates")
     nbconvert_path = None
     for path in possible_paths:
         if os.path.exists(path):
             nbconvert_path = path
             break
 
-    nbconvert_target = jp_data_dir / 'nbconvert' / 'templates'
+    nbconvert_target = jp_data_dir / "nbconvert" / "templates"
 
     # copy nbconvert templates to new tmp data_dir.
     if nbconvert_path:
         shutil.copytree(nbconvert_path, str(nbconvert_target))
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def jp_configurable_serverapp(
     jp_nbconvert_templates,  # this fixture must preceed jp_environ
     jp_environ,
@@ -155,14 +152,14 @@ def jp_configurable_serverapp(
         http_port=jp_http_port,
         tmp_path=tmp_path,
         root_dir=jp_root_dir,
-        **kwargs
+        **kwargs,
     ):
         c = Config(config)
         c.NotebookNotary.db_file = ":memory:"
         token = hexlify(os.urandom(4)).decode("ascii")
         app = ServerApp.instance(
             # Set the log level to debug for testing purposes
-            log_level='DEBUG',
+            log_level="DEBUG",
             port=http_port,
             port_retries=0,
             open_browser=False,
@@ -171,7 +168,7 @@ def jp_configurable_serverapp(
             config=c,
             allow_root=True,
             token=token,
-            **kwargs
+            **kwargs,
         )
 
         app.init_signal = lambda: None
@@ -201,10 +198,12 @@ def jp_ensure_app_fixture(request):
     """
     app_option = request.config.getoption("app_fixture")
     if app_option not in ["app", "jp_web_app"]:
-        raise Exception("jp_serverapp requires the `app-fixture` option "
-                        "to be set to 'jp_web_app`. Try rerunning the "
-                        "current tests with the option `--app-fixture "
-                        "jp_web_app`.")
+        raise Exception(
+            "jp_serverapp requires the `app-fixture` option "
+            "to be set to 'jp_web_app`. Try rerunning the "
+            "current tests with the option `--app-fixture "
+            "jp_web_app`."
+        )
     elif app_option == "app":
         # Manually set the app_fixture to `jp_web_app` if it's
         # not set already.
@@ -212,12 +211,7 @@ def jp_ensure_app_fixture(request):
 
 
 @pytest.fixture(scope="function")
-def jp_serverapp(
-    jp_ensure_app_fixture,
-    jp_server_config,
-    jp_argv,
-    jp_configurable_serverapp
-):
+def jp_serverapp(jp_ensure_app_fixture, jp_server_config, jp_argv, jp_configurable_serverapp):
     """Starts a Jupyter Server instance based on the established configuration values."""
     app = jp_configurable_serverapp(config=jp_server_config, argv=jp_argv)
     yield app
@@ -235,7 +229,7 @@ def jp_web_app(jp_serverapp):
 @pytest.fixture
 def jp_auth_header(jp_serverapp):
     """Configures an authorization header using the token from the serverapp fixture."""
-    return {"Authorization": "token {token}".format(token=jp_serverapp.token)}
+    return {"Authorization": f"token {jp_serverapp.token}"}
 
 
 @pytest.fixture
@@ -259,8 +253,11 @@ def jp_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_base_url):
             response = await jp_fetch("api", "spec.yaml")
             ...
     """
-    def client_fetch(*parts, headers={}, params={}, **kwargs):
+
+    def client_fetch(*parts, headers=None, params=None, **kwargs):
         # Handle URL strings
+        headers = headers or {}
+        params = params or {}
         path_url = url_escape(url_path_join(*parts), plus=False)
         base_path_url = url_path_join(jp_base_url, path_url)
         params_url = urllib.parse.urlencode(params)
@@ -268,9 +265,8 @@ def jp_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_base_url):
         # Add auth keys to header
         headers.update(jp_auth_header)
         # Make request.
-        return http_server_client.fetch(
-            url, headers=headers, request_timeout=20, **kwargs
-        )
+        return http_server_client.fetch(url, headers=headers, request_timeout=20, **kwargs)
+
     return client_fetch
 
 
@@ -301,45 +297,44 @@ def jp_ws_fetch(jp_serverapp, jp_auth_header, jp_http_port, jp_base_url):
             )
             ...
     """
-    def client_fetch(*parts, headers={}, params={}, **kwargs):
+
+    def client_fetch(*parts, headers=None, params=None, **kwargs):
         # Handle URL strings
+        headers = headers or {}
+        params = params or {}
         path_url = url_escape(url_path_join(*parts), plus=False)
         base_path_url = url_path_join(jp_base_url, path_url)
-        urlparts = urllib.parse.urlparse('ws://localhost:{}'.format(jp_http_port))
-        urlparts = urlparts._replace(
-            path=base_path_url,
-            query=urllib.parse.urlencode(params)
-        )
+        urlparts = urllib.parse.urlparse(f"ws://localhost:{jp_http_port}")
+        urlparts = urlparts._replace(path=base_path_url, query=urllib.parse.urlencode(params))
         url = urlparts.geturl()
         # Add auth keys to header
         headers.update(jp_auth_header)
         # Make request.
-        req = tornado.httpclient.HTTPRequest(
-            url,
-            headers=jp_auth_header,
-            connect_timeout=120
-        )
+        req = tornado.httpclient.HTTPRequest(url, headers=jp_auth_header, connect_timeout=120)
         return tornado.websocket.websocket_connect(req)
+
     return client_fetch
 
 
-some_resource = u"The very model of a modern major general"
+some_resource = "The very model of a modern major general"
 sample_kernel_json = {
-    'argv':['cat', '{connection_file}'],
-    'display_name': 'Test kernel',
+    "argv": ["cat", "{connection_file}"],
+    "display_name": "Test kernel",
 }
+
+
 @pytest.fixture
 def jp_kernelspecs(jp_data_dir):
     """Configures some sample kernelspecs in the Jupyter data directory."""
-    spec_names = ['sample', 'sample 2']
+    spec_names = ["sample", "sample 2"]
     for name in spec_names:
-        sample_kernel_dir = jp_data_dir.joinpath('kernels', name)
+        sample_kernel_dir = jp_data_dir.joinpath("kernels", name)
         sample_kernel_dir.mkdir(parents=True)
         # Create kernel json file
-        sample_kernel_file = sample_kernel_dir.joinpath('kernel.json')
+        sample_kernel_file = sample_kernel_dir.joinpath("kernel.json")
         sample_kernel_file.write_text(json.dumps(sample_kernel_json))
         # Create resources text
-        sample_kernel_resources = sample_kernel_dir.joinpath('resource.txt')
+        sample_kernel_resources = sample_kernel_dir.joinpath("resource.txt")
         sample_kernel_resources.write_text(some_resource)
 
 
@@ -358,10 +353,11 @@ def jp_large_contents_manager(tmp_path):
 @pytest.fixture
 def jp_create_notebook(jp_root_dir):
     """Creates a notebook in the test's home directory."""
+
     def inner(nbpath):
         nbpath = jp_root_dir.joinpath(nbpath)
         # Check that the notebook has the correct file extension.
-        if nbpath.suffix != '.ipynb':
+        if nbpath.suffix != ".ipynb":
             raise Exception("File extension for notebook must be .ipynb")
         # If the notebook path has a parent directory, make sure it's created.
         parent = nbpath.parent
@@ -370,4 +366,5 @@ def jp_create_notebook(jp_root_dir):
         nb = nbformat.v4.new_notebook()
         nbtext = nbformat.writes(nb, version=4)
         nbpath.write_text(nbtext)
+
     return inner

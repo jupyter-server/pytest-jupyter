@@ -1,16 +1,18 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 import os
-import pytest
 import sys
+
+import pytest
 
 # The try block is needed so that the documentation can
 # still build without needed to install all the dependencies.
 try:
     import jupyter_core.paths
 
-except (ModuleNotFoundError, ImportError) as e:
+except ImportError:
     import warnings
+
     warnings.warn(
         "The jupyter_core plugin has not been installed. "
         "If you're trying to use this plugin and you've installed "
@@ -20,6 +22,7 @@ except (ModuleNotFoundError, ImportError) as e:
 
 
 from .utils import mkdir
+
 
 @pytest.fixture
 def jp_home_dir(tmp_path):
@@ -82,18 +85,14 @@ def jp_environ(
     jp_env_jupyter_path,
     jp_env_config_path,
 ):
-    """Configures a temporary environment based on Jupyter-specific environment variables. """
+    """Configures a temporary environment based on Jupyter-specific environment variables."""
     monkeypatch.setenv("HOME", str(jp_home_dir))
     monkeypatch.setenv("PYTHONPATH", os.pathsep.join(sys.path))
     # monkeypatch.setenv("JUPYTER_NO_CONFIG", "1")
     monkeypatch.setenv("JUPYTER_CONFIG_DIR", str(jp_config_dir))
     monkeypatch.setenv("JUPYTER_DATA_DIR", str(jp_data_dir))
     monkeypatch.setenv("JUPYTER_RUNTIME_DIR", str(jp_runtime_dir))
-    monkeypatch.setattr(
-        jupyter_core.paths, "SYSTEM_JUPYTER_PATH", [str(jp_system_jupyter_path)]
-    )
+    monkeypatch.setattr(jupyter_core.paths, "SYSTEM_JUPYTER_PATH", [str(jp_system_jupyter_path)])
     monkeypatch.setattr(jupyter_core.paths, "ENV_JUPYTER_PATH", [str(jp_env_jupyter_path)])
-    monkeypatch.setattr(
-        jupyter_core.paths, "SYSTEM_CONFIG_PATH", [str(jp_system_config_path)]
-    )
+    monkeypatch.setattr(jupyter_core.paths, "SYSTEM_CONFIG_PATH", [str(jp_system_config_path)])
     monkeypatch.setattr(jupyter_core.paths, "ENV_CONFIG_PATH", [str(jp_env_config_path)])
