@@ -3,6 +3,7 @@
 First, bump the version to final release version.
 
 Then follow these steps (which expect a Bash shell; they might not work with other shells).
+
 ```
 git clean -dffx
 pip install -q 517
