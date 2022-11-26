@@ -24,22 +24,27 @@ classifiers = [
 ]
 dependencies = [
     "pytest",
+    "pytest-asyncio",
+    "jupyter_core"
 ]
+requires-python = ">=3.8"
+
 
 [project.optional-dependencies]
-core = [
-    "jupyter_core",
-]
 docs = [
     "myst_parser",
     "pydata_sphinx_theme",
     "Sphinx",
 ]
+client = [
+    "jupyter_client"
+]
 server = [
-    "jupyter_core",
     "jupyter_server",
     "nbformat",
-    "pytest-tornasync",
+]
+test = [
+    "pytest-timeout"
 ]
 
 [project.urls]
@@ -51,6 +56,7 @@ path = "pytest_jupyter/_version.py"
 [tool.hatch.build.targets.sdist]
 include = [
     "/pytest_jupyter",
+    "/tests",
 ]
 
 [tool.hatch.envs.docs]
