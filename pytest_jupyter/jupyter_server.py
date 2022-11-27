@@ -251,7 +251,6 @@ def jp_configurable_serverapp(
             allow_root=True,
             **kwargs,
         )
-
         app.init_signal = lambda: None
         app.log.propagate = True
         app.log.handlers = []
@@ -412,6 +411,8 @@ def jp_server_cleanup(asyncio_loop):
         asyncio_loop.run_until_complete(app._cleanup())
     except (RuntimeError, SystemExit) as e:
         print("ignoring cleanup error", e)
+    if hasattr(app, "kernel_manager"):
+        app.kernel_manager.context.destroy()
     ServerApp.clear_instance()
 
 

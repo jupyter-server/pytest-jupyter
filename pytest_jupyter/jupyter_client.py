@@ -69,6 +69,8 @@ async def start_kernel(kernel_spec):
         kc.stop_channels()
         await km.shutdown_kernel(now=True)
         assert km.context.closed
+        km.context.destroy()
+        km.context.term()
 
 
 @pytest.fixture()
