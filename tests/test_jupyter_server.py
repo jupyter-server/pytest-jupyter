@@ -2,7 +2,6 @@ import json
 import os
 from unittest.mock import MagicMock
 
-from jupyter_client.kernelspec import NATIVE_KERNEL_NAME
 from jupyter_server.auth import Authorizer
 from jupyter_server.serverapp import ServerApp
 from tornado.websocket import WebSocketHandler
@@ -24,9 +23,7 @@ async def test_send_request(send_request):
 
 async def test_connection(jp_fetch, jp_ws_fetch, jp_http_port, jp_auth_header):
     # Create kernel
-    r = await jp_fetch(
-        "api", "kernels", method="POST", body=json.dumps({"name": NATIVE_KERNEL_NAME})
-    )
+    r = await jp_fetch("api", "kernels", method="POST", body=json.dumps({"name": "echo"}))
     kid = json.loads(r.body.decode())["id"]
 
     # Get kernel info

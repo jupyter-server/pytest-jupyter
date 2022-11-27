@@ -45,6 +45,7 @@ except ImportError:
     )
 
 
+from .jupyter_client import kernel_spec  # noqa
 from .utils import mkdir
 
 # List of dependencies needed for this plugin.
@@ -190,6 +191,7 @@ def jp_configurable_serverapp(
     jp_logging_stream,
     asyncio_loop,
     io_loop,
+    kernel_spec,  # noqa
 ):
     """Starts a Jupyter Server instance based on
     the provided configuration values.
@@ -249,7 +251,6 @@ def jp_configurable_serverapp(
             allow_root=True,
             **kwargs,
         )
-
         app.init_signal = lambda: None
         app.log.propagate = True
         app.log.handlers = []
@@ -410,6 +411,8 @@ def jp_server_cleanup(asyncio_loop):
         asyncio_loop.run_until_complete(app._cleanup())
     except (RuntimeError, SystemExit) as e:
         print("ignoring cleanup error", e)
+    if hasattr(app, "kernel_manager"):
+        app.kernel_manager.context.destroy()
     ServerApp.clear_instance()
 
 
