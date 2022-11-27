@@ -25,8 +25,6 @@ try:
     from jupyter_server.auth import Authorizer
     from jupyter_server.extension import serverextension
     from jupyter_server.serverapp import JUPYTER_SERVICE_HANDLERS, ServerApp
-    from jupyter_server.services.contents.filemanager import AsyncFileContentsManager
-    from jupyter_server.services.contents.largefilemanager import AsyncLargeFileManager
     from jupyter_server.utils import url_path_join
     from pytest_tornasync.plugin import AsyncHTTPServerClient
     from tornado.escape import url_escape
