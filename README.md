@@ -40,6 +40,9 @@ The `pytest_jupyter.jupyter_client` plugin provides an installed
 that provides a factory function that starts a kernel using the `echo` kernel
 by default.
 
+Note: The server plugin also includes the client plugin, so you can use both
+sets of fixtures with `"pytest_jupyter.jupyter_server"`.
+
 The server fixures use the echo kernel by default.  To override this behavior,
 override the `jp_server_config` fixture and add the following config:
 
