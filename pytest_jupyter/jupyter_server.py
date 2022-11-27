@@ -52,12 +52,9 @@ from pytest_jupyter.utils import mkdir
 pytest_plugins = ["pytest_tornasync"]
 
 
-@pytest.fixture(autouse=True)
-def io_loop(jp_asyncio_loop):
-    async def get_tornado_loop():
-        return tornado.ioloop.IOLoop.current()
-
-    return jp_asyncio_loop.run_until_complete(get_tornado_loop())
+# Override some of the fixtures from pytest_tornasync
+# The io_loop fixture is overidden in jupyter_core.py so it
+# can be shared by other plugins that need it (e.g. jupyter_client.py).
 
 
 @pytest.fixture
@@ -93,6 +90,9 @@ def http_server(io_loop, http_server_port, jp_web_app):
     http_server_port[0].close()
 
 
+# End pytest_tornasync overrides
+
+
 @pytest.fixture
 def jp_server_config():
     """Allows tests to setup their specific configuration values."""
@@ -125,17 +125,17 @@ def jp_argv():
     return []
 
 
-@pytest.fixture
-def jp_extension_environ(jp_env_config_path, monkeypatch):
-    """Monkeypatch a Jupyter Extension's config path into each test's environment variable"""
-    monkeypatch.setattr(serverextension, "ENV_CONFIG_PATH", [str(jp_env_config_path)])
-
-
-@pytest.fixture
+@pytest.fixture()
 def jp_http_port(http_server_port):
     """Returns the port value from the http_server_port fixture."""
     yield http_server_port[-1]
     http_server_port[0].close()
+
+
+@pytest.fixture
+def jp_extension_environ(jp_env_config_path, monkeypatch):
+    """Monkeypatch a Jupyter Extension's config path into each test's environment variable"""
+    monkeypatch.setattr(serverextension, "ENV_CONFIG_PATH", [str(jp_env_config_path)])
 
 
 @pytest.fixture

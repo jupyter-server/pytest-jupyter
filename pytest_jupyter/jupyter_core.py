@@ -47,6 +47,22 @@ def jp_asyncio_loop():
     loop.close()
 
 
+@pytest.fixture(autouse=True)
+def io_loop(jp_asyncio_loop):
+    """Override the io_loop for pytest_tornasync.  This is a no-op
+    if tornado is not installed."""
+
+    async def get_tornado_loop():
+        try:
+            from tornado.ioloop import IOLoop
+
+            return IOLoop.current()
+        except ImportError:
+            pass
+
+    return jp_asyncio_loop.run_until_complete(get_tornado_loop())
+
+
 @pytest.fixture
 def jp_home_dir(tmp_path):
     """Provides a temporary HOME directory value."""
