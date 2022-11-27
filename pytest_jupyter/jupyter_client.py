@@ -7,7 +7,6 @@ import sys
 from pathlib import Path
 
 import pytest
-import pytest_asyncio
 from jupyter_core import paths
 
 try:
@@ -56,8 +55,8 @@ def zmq_context():
     ctx.term()
 
 
-@pytest_asyncio.fixture
-async def start_kernel(echo_kernel_spec):
+@pytest.fixture
+def start_kernel(echo_kernel_spec, asyncio_loop):
     kms = []
     kcs = []
 
@@ -73,7 +72,7 @@ async def start_kernel(echo_kernel_spec):
         kc.stop_channels()
 
     for km in kms:
-        await km.shutdown_kernel(now=True)
+        asyncio_loop.run_until_complete(km.shutdown_kernel(now=True))
         assert km.context.closed
 
 

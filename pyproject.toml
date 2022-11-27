@@ -24,7 +24,6 @@ classifiers = [
 ]
 dependencies = [
     "pytest",
-    "pytest-asyncio",
     "jupyter_core"
 ]
 requires-python = ">=3.8"
@@ -89,7 +88,6 @@ addopts = "-raXs --durations 10 --color=yes --doctest-modules"
 testpaths = [
     "tests"
 ]
-asyncio_mode = "strict"
 timeout = 10
 # Restore this setting to debug failures
 timeout_method = "thread"
