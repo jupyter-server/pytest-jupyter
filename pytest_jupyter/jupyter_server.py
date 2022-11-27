@@ -191,7 +191,7 @@ def jp_configurable_serverapp(
     jp_logging_stream,
     asyncio_loop,
     io_loop,
-    kernel_spec,
+    kernel_spec,  # noqa
 ):
     """Starts a Jupyter Server instance based on
     the provided configuration values.
