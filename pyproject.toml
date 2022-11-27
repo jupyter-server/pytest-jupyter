@@ -96,7 +96,7 @@ filterwarnings= [
   # Fail on warnings
   "error",
   # TODO: from jupyter_server
-  "always:unclosed <socket.socket:ResourceWarning",
+  "always:unclosed <socket.socket:ResourceWarning"
 ]
 
 [tool.coverage.report]

@@ -23,7 +23,7 @@ async def test_send_request(send_request):
 
 async def test_connection(jp_fetch, jp_ws_fetch, jp_http_port, jp_auth_header):
     # Create kernel
-    r = await jp_fetch("api", "kernels", method="POST", body=json.dumps({"name": "echo"}))
+    r = await jp_fetch("api", "kernels", method="POST", body="{}")
     kid = json.loads(r.body.decode())["id"]
 
     # Get kernel info

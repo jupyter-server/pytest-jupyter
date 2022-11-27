@@ -15,6 +15,11 @@ async def test_start_kernel(start_kernel):
     msg = await kc.execute("hello", reply=True)
     assert msg["content"]["status"] == "ok"
 
+    km, kc = await start_kernel("python3")
+    assert km.kernel_name == "python3"
+    msg = await kc.execute("print('hi')", reply=True)
+    assert msg["content"]["status"] == "ok"
+
 
 def test_echo_kernel():
     kernel = EchoKernel()
