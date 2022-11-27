@@ -54,6 +54,7 @@ Homepage = "http://jupyter.org"
 
 [tool.hatch.version]
 path = "pytest_jupyter/_version.py"
+validate-bump = false
 
 [tool.hatch.build.targets.sdist]
 include = [
@@ -78,6 +79,9 @@ dependencies = ["coverage", "pytest-cov"]
 [tool.hatch.envs.cov.scripts]
 test = "python -m pytest -vv --cov pytest_jupyter --cov-branch --cov-report term-missing:skip-covered {args}"
 nowarn = "test -W default {args}"
+
+[tool.jupyter-releaser.options]
+post-version-spec = "dev"
 
 [tool.pytest.ini_options]
 addopts = "-raXs --durations 10 --color=yes --doctest-modules"
