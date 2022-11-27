@@ -4,7 +4,6 @@
 import asyncio
 import importlib
 import io
-import json
 import logging
 import os
 import re
@@ -22,17 +21,18 @@ try:
     import nbformat
     import tornado
     import tornado.testing
+    from jupyter_server._version import version_info
     from jupyter_server.auth import Authorizer
     from jupyter_server.extension import serverextension
     from jupyter_server.serverapp import JUPYTER_SERVICE_HANDLERS, ServerApp
-    from jupyter_server.services.contents.filemanager import AsyncFileContentsManager
-    from jupyter_server.services.contents.largefilemanager import AsyncLargeFileManager
     from jupyter_server.utils import url_path_join
     from pytest_tornasync.plugin import AsyncHTTPServerClient
     from tornado.escape import url_escape
     from tornado.httpclient import HTTPClientError
     from tornado.websocket import WebSocketHandler
     from traitlets.config import Config
+
+    is_v2 = version_info[0] == 2
 
 except ImportError:
     import warnings
@@ -51,22 +51,9 @@ from .utils import mkdir
 pytest_plugins = ["pytest_tornasync", "pytest_jupyter"]
 
 
-# NOTE: This is a temporary fix for Windows 3.8
-# We have to override the io_loop fixture with an
-# asyncio patch. This will probably be removed in
-# the future.
 @pytest.fixture
-def jp_asyncio_patch():
-    """Appropriately configures the event loop policy if running on Windows w/ Python >= 3.8."""
-    ServerApp()._init_asyncio_patch()
-
-
-@pytest.fixture
-def asyncio_loop():
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    yield loop
-    loop.close()
+async def asyncio_loop():
+    return asyncio.get_running_loop()
 
 
 @pytest.fixture(autouse=True)
@@ -113,11 +100,14 @@ def http_server(io_loop, http_server_port, jp_web_app):
 @pytest.fixture
 def jp_server_config():
     """Allows tests to setup their specific configuration values."""
-    return Config(
-        {
-            "jpserver_extensions": {"jupyter_server_terminals": True},
-        }
-    )
+    if is_v2:
+        return Config(
+            {
+                "jpserver_extensions": {"jupyter_server_terminals": True},
+            }
+        )
+    else:
+        return Config({})
 
 
 @pytest.fixture
@@ -199,6 +189,7 @@ def jp_configurable_serverapp(
     jp_root_dir,
     jp_logging_stream,
     asyncio_loop,
+    io_loop,
 ):
     """Starts a Jupyter Server instance based on
     the provided configuration values.
@@ -218,7 +209,7 @@ def jp_configurable_serverapp(
     # explicitly put in config.
     serverapp_config = jp_server_config.setdefault("ServerApp", {})
     exts = serverapp_config.setdefault("jpserver_extensions", {})
-    if "jupyter_server_terminals" not in exts:
+    if "jupyter_server_terminals" not in exts and is_v2:
         exts["jupyter_server_terminals"] = True
 
     def _configurable_serverapp(
@@ -228,14 +219,19 @@ def jp_configurable_serverapp(
         environ=jp_environ,
         http_port=jp_http_port,
         tmp_path=tmp_path,
+        io_loop=io_loop,
         root_dir=jp_root_dir,
         **kwargs,
     ):
         c = Config(config)
         c.NotebookNotary.db_file = ":memory:"
-        if "token" not in c.ServerApp and not c.IdentityProvider.token:
-            token = hexlify(os.urandom(4)).decode("ascii")
-            c.IdentityProvider.token = token
+
+        default_token = hexlify(os.urandom(4)).decode("ascii")
+        if not is_v2:
+            kwargs["token"] = default_token
+
+        elif "token" not in c.ServerApp and not c.IdentityProvider.token:
+            c.IdentityProvider.token = default_token
 
         # Allow tests to configure root_dir via a file, argv, or its
         # default (cwd) by specifying a value of None.
@@ -294,6 +290,8 @@ def jp_web_app(jp_serverapp):
 @pytest.fixture
 def jp_auth_header(jp_serverapp):
     """Configures an authorization header using the token from the serverapp fixture."""
+    if not is_v2:
+        return {"Authorization": f"token {jp_serverapp.token}"}
     return {"Authorization": f"token {jp_serverapp.identity_provider.token}"}
 
 
@@ -331,6 +329,7 @@ def jp_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_base_url):
         for key, value in jp_auth_header.items():
             headers.setdefault(key, value)
         # Make request.
+        print(id(http_server_client.io_loop.asyncio_loop))
         return http_server_client.fetch(url, headers=headers, request_timeout=20, **kwargs)
 
     return client_fetch
@@ -382,43 +381,6 @@ def jp_ws_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_http_port, 
     return client_fetch
 
 
-some_resource = "The very model of a modern major general"
-sample_kernel_json = {
-    "argv": ["cat", "{connection_file}"],
-    "display_name": "Test kernel",
-}
-
-
-@pytest.fixture
-def jp_kernelspecs(jp_data_dir):
-    """Configures some sample kernelspecs in the Jupyter data directory."""
-    spec_names = ["sample", "sample2", "bad"]
-    for name in spec_names:
-        sample_kernel_dir = jp_data_dir.joinpath("kernels", name)
-        sample_kernel_dir.mkdir(parents=True)
-        # Create kernel json file
-        sample_kernel_file = sample_kernel_dir.joinpath("kernel.json")
-        kernel_json = sample_kernel_json.copy()
-        if name == "bad":
-            kernel_json["argv"] = ["non_existent_path"]
-        sample_kernel_file.write_text(json.dumps(kernel_json))
-        # Create resources text
-        sample_kernel_resources = sample_kernel_dir.joinpath("resource.txt")
-        sample_kernel_resources.write_text(some_resource)
-
-
-@pytest.fixture(params=[True, False])
-def jp_contents_manager(request, tmp_path):
-    """Returns an AsyncFileContentsManager instance based on the use_atomic_writing parameter value."""
-    return AsyncFileContentsManager(root_dir=str(tmp_path), use_atomic_writing=request.param)
-
-
-@pytest.fixture
-def jp_large_contents_manager(tmp_path):
-    """Returns an AsyncLargeFileManager instance."""
-    return AsyncLargeFileManager(root_dir=str(tmp_path))
-
-
 @pytest.fixture
 def jp_create_notebook(jp_root_dir):
     """Creates a notebook in the test's home directory."""
@@ -435,6 +397,7 @@ def jp_create_notebook(jp_root_dir):
         nb = nbformat.v4.new_notebook()
         nbtext = nbformat.writes(nb, version=4)
         nbpath.write_text(nbtext)
+        return nb
 
     return inner
 
