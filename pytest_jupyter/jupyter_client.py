@@ -69,9 +69,10 @@ async def start_kernel(kernel_spec):
 
     yield inner
 
-    kc.stop_channels()  # type:ignore
-    await km.shutdown_kernel()  # type: ignore
-    assert km.context.closed  # type:ignore
+    if kc:
+        kc.stop_channels()
+        await km.shutdown_kernel(now=True)  # type: ignore
+        assert km.context.closed  # type:ignore
 
 
 @pytest.fixture()

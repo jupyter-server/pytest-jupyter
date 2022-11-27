@@ -75,9 +75,9 @@ nowarn = "test -W default {args}"
 
 [tool.hatch.envs.cov]
 features = ["test", "server", "client"]
-dependencies = ["coverage", "pytest-cov"]
+dependencies = ["coverage[toml]"]
 [tool.hatch.envs.cov.scripts]
-test = "python -m pytest -vv --cov pytest_jupyter --cov-branch --cov-report term-missing:skip-covered {args}"
+test = "coverage run -m pytest {args}"
 nowarn = "test -W default {args}"
 
 [tool.jupyter-releaser.options]
@@ -89,9 +89,9 @@ testpaths = [
     "tests"
 ]
 asyncio_mode = "auto"
-timeout = 30
+timeout = 10
 # Restore this setting to debug failures
-#timeout_method = "thread"
+timeout_method = "thread"
 filterwarnings= [
   # Fail on warnings
   "error",
