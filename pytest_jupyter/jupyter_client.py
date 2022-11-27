@@ -22,6 +22,8 @@ except ImportError:
         "you need. Try: `pip install 'pytest-jupyter[client]'`"
     )
 
+from pytest_jupyter import *  # noqa
+
 try:
     import resource
 except ImportError:
