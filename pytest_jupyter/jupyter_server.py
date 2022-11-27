@@ -14,6 +14,7 @@ from contextlib import closing
 
 import jupyter_core.paths
 import pytest
+import pytest_asyncio
 
 # The try block is needed so that the documentation can
 # still build without needed to install all the dependencies.
@@ -51,7 +52,7 @@ from pytest_jupyter.utils import mkdir
 pytest_plugins = ["pytest_tornasync", "pytest_jupyter.jupyter_client"]
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def asyncio_loop():
     return asyncio.get_running_loop()
 

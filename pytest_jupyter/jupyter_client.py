@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 
 import pytest
+import pytest_asyncio
 from jupyter_core import paths
 
 try:
@@ -55,7 +56,7 @@ def zmq_context():
     ctx.term()
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def start_kernel(echo_kernel_spec):
     kms = []
     kcs = []
