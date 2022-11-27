@@ -53,7 +53,7 @@ jobs:
           dependency_type: minimum
       - name: Run the unit tests
         run: |
-          hatch run test:nowarn || hatch run test:nowarn --lf
+          hatch -v run test:nowarn || hatch run test:nowarn --lf
 
   test_prereleases:
     name: Test Prereleases
@@ -85,6 +85,8 @@ jobs:
     steps:
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
       - uses: jupyterlab/maintainer-tools/.github/actions/test-sdist@v1
+        with:
+          test_command: hatch run test:test
 
   pre_commit:
     name: pre-commit
