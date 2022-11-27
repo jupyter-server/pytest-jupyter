@@ -1,6 +1,5 @@
 from unittest.mock import Mock
 
-import pytest
 from jupyter_client.session import Session
 
 from pytest_jupyter.echo_kernel import EchoKernel
