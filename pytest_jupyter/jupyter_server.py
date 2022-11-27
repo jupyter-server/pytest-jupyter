@@ -45,7 +45,7 @@ except ImportError:
     )
 
 
-from .jupyter_client import kernel_spec
+from .jupyter_client import kernel_spec  # noqa
 from .utils import mkdir
 
 # List of dependencies needed for this plugin.
