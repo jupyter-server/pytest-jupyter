@@ -45,11 +45,10 @@ except ImportError:
     )
 
 
-from .jupyter_client import echo_kernel_spec  # noqa
-from .utils import mkdir
+from pytest_jupyter.utils import mkdir
 
 # List of dependencies needed for this plugin.
-pytest_plugins = ["pytest_tornasync", "pytest_jupyter"]
+pytest_plugins = ["pytest_tornasync", "pytest_jupyter.jupyter_client"]
 
 
 @pytest.fixture
