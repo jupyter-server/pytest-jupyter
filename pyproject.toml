@@ -37,11 +37,11 @@ docs = [
     "Sphinx",
 ]
 client = [
-    "jupyter_client>=7.4.0"
+    "jupyter_client>=7.4.0",
+    "ipykernel>=6.14",
 ]
 server = [
     "jupyter_server>=1.21",
-    "ipykernel>=6.14",
     "nbformat>=5.3",
     "pytest-tornasync>=0.6"
 ]

@@ -45,6 +45,7 @@ except ImportError:
     )
 
 
+from .jupyter_client import kernel_spec
 from .utils import mkdir
 
 # List of dependencies needed for this plugin.
@@ -190,6 +191,7 @@ def jp_configurable_serverapp(
     jp_logging_stream,
     asyncio_loop,
     io_loop,
+    kernel_spec,
 ):
     """Starts a Jupyter Server instance based on
     the provided configuration values.
