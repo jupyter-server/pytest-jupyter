@@ -54,23 +54,24 @@ def zmq_context():
 
 
 @pytest.fixture
-async def start_kernel(kernel_spec):
-    km = None
-    kc = None
+async def start_kernel(echo_kernel_spec):
+    kms = []
+    kcs = []
 
     async def inner(kernel_name="echo", **kwargs):
-        nonlocal km, kc
         km, kc = await start_new_async_kernel(kernel_name=kernel_name, **kwargs)
+        kms.append(km)
+        kcs.append(kc)
         return km, kc
 
     yield inner
 
-    if kc and km:
+    for kc in kcs:
         kc.stop_channels()
+
+    for km in kms:
         await km.shutdown_kernel(now=True)
         assert km.context.closed
-        km.context.destroy()
-        km.context.term()
 
 
 @pytest.fixture()
@@ -79,7 +80,7 @@ def kernel_dir():
 
 
 @pytest.fixture
-def kernel_spec(kernel_dir):
+def echo_kernel_spec(kernel_dir):
     test_dir = Path(kernel_dir) / "echo"
     test_dir.mkdir(parents=True, exist_ok=True)
     argv = [sys.executable, "-m", "pytest_jupyter.echo_kernel", "-f", "{connection_file}"]

@@ -31,6 +31,26 @@ To use a plugin, add it to the `pytest_plugins` list in the `conftest.py` of you
 pytest_plugins = ["pytest_jupyter.jupyter_server"]
 ```
 
+This library includes an `echo_kernel`, which is useful to speed up testing.
+You must have either `"pytest-jupyter[server]"` or `"pytest-jupyter[client]"`
+installed to use the echo kernel.
+
+The `pytest_jupyter.jupyter_client` plugin provides an installed
+`echo_kernel_spec` as a fixture, and a `start_kernel` fixture
+that provides a factory function that starts a kernel using the `echo` kernel
+by default.
+
+The server fixures use the echo kernel by default.  To override this behavior,
+override the `jp_server_config` fixture and add the following config:
+
+```json
+{
+    "MultiKernelManager": {
+        "default_kernel_name": "<desired_kernel_name"
+    }
+}
+```
+
 All fixtures inside the plugin (e.g. jupyter_server) will be available to all of your project's unit tests. You can use a fixtures by passing it as an argument to your unit test function:
 
 ```python

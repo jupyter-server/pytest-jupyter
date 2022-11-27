@@ -45,7 +45,7 @@ except ImportError:
     )
 
 
-from .jupyter_client import kernel_spec  # noqa
+from .jupyter_client import echo_kernel_spec  # noqa
 from .utils import mkdir
 
 # List of dependencies needed for this plugin.
@@ -102,13 +102,14 @@ def http_server(io_loop, http_server_port, jp_web_app):
 def jp_server_config():
     """Allows tests to setup their specific configuration values."""
     if is_v2:
-        return Config(
-            {
+        config = {
+            "ServerApp": {
                 "jpserver_extensions": {"jupyter_server_terminals": True},
             }
-        )
+        }
     else:
-        return Config({})
+        config = {}
+    return Config(config)
 
 
 @pytest.fixture
@@ -191,7 +192,7 @@ def jp_configurable_serverapp(
     jp_logging_stream,
     asyncio_loop,
     io_loop,
-    kernel_spec,  # noqa
+    echo_kernel_spec,  # noqa
 ):
     """Starts a Jupyter Server instance based on
     the provided configuration values.
@@ -227,6 +228,9 @@ def jp_configurable_serverapp(
     ):
         c = Config(config)
         c.NotebookNotary.db_file = ":memory:"
+
+        if "default_kernel_name" not in c.MultiKernelManager:
+            c.MultiKernelManager.default_kernel_name = "echo"
 
         default_token = hexlify(os.urandom(4)).decode("ascii")
         if not is_v2:
