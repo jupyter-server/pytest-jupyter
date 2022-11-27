@@ -1,12 +1,50 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
+import asyncio
+import json
 import os
 import sys
+from pathlib import Path
 
 import jupyter_core
 import pytest
 
 from .utils import mkdir
+
+try:
+    import resource
+except ImportError:
+    # Windows
+    resource = None  # type: ignore
+
+
+# Handle resource limit
+# Ensure a minimal soft limit of DEFAULT_SOFT if the current hard limit is at least that much.
+if resource is not None:
+    soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
+
+    DEFAULT_SOFT = 4096
+    if hard >= DEFAULT_SOFT:
+        soft = DEFAULT_SOFT
+
+    if hard < soft:
+        hard = soft
+
+    resource.setrlimit(resource.RLIMIT_NOFILE, (soft, hard))
+
+
+if os.name == "nt":
+    asyncio.set_event_loop_policy(
+        asyncio.WindowsSelectorEventLoopPolicy()  # type:ignore[attr-defined]
+    )
+
+
+@pytest.fixture
+def jp_asyncio_loop():
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    yield loop
+    loop.close()
 
 
 @pytest.fixture
@@ -57,6 +95,22 @@ def jp_env_config_path(tmp_path):
     return mkdir(tmp_path, "env", "etc", "jupyter")
 
 
+@pytest.fixture()
+def jp_kernel_dir(jp_data_dir):
+    return mkdir(jp_data_dir, "kernels")
+
+
+@pytest.fixture
+def echo_kernel_spec(jp_kernel_dir):
+    test_dir = Path(jp_kernel_dir) / "echo"
+    test_dir.mkdir(parents=True, exist_ok=True)
+    argv = [sys.executable, "-m", "pytest_jupyter.echo_kernel", "-f", "{connection_file}"]
+    kernel_data = {"argv": argv, "display_name": "echo", "language": "echo"}
+    spec_file_path = Path(test_dir / "kernel.json")
+    spec_file_path.write_text(json.dumps(kernel_data), "utf8")
+    return str(test_dir)
+
+
 @pytest.fixture
 def jp_environ(
     monkeypatch,
@@ -65,6 +119,7 @@ def jp_environ(
     jp_data_dir,
     jp_config_dir,
     jp_runtime_dir,
+    echo_kernel_spec,
     jp_system_jupyter_path,
     jp_system_config_path,
     jp_env_jupyter_path,
