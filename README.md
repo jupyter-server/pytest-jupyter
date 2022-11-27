@@ -40,9 +40,15 @@ The `pytest_jupyter.jupyter_client` plugin provides an installed
 that provides a factory function that starts a kernel using the `echo` kernel
 by default.
 
-Note: The server plugin also includes the client plugin, so you can use both
+*Note*: The server plugin also includes the client plugin, so you can use both
 sets of fixtures with `"pytest_jupyter.jupyter_server"`.  Both the `client`
 and `server` plugins also include the core fixtures.
+
+*Note*: The client and server plugins use `pytest-tornasync` for async
+test suite running.  It may not compatible with `pytest-asyncio`, meaning
+that all fixtures must be synchronous.  You can use the `asyncio_loop` fixture
+and run `asyncio_loop.run_until_complete` against an async function in your
+fixtures if needed.
 
 The server fixures use the echo kernel by default.  To override this behavior,
 override the `jp_server_config` fixture and add the following config:

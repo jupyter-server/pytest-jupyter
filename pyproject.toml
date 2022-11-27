@@ -38,12 +38,12 @@ docs = [
 client = [
     "jupyter_client>=7.4.0",
     "ipykernel>=6.14",
+    "pytest-tornasync>=0.6"
 ]
 server = [
     "jupyter_server>=1.21",
     "nbformat>=5.3",
     "pytest-jupyter[client]",
-    "pytest-tornasync>=0.6"
 ]
 test = [
     "pytest-timeout"
