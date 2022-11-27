@@ -11,8 +11,8 @@ import pytest
 from jupyter_core import paths
 
 try:
-    import ipykernel
-    import jupyter_client
+    import ipykernel  # noqa
+    from jupyter_client.manager import start_new_async_kernel
 except ImportError:
     import warnings
 
@@ -56,9 +56,6 @@ def zmq_context():
 
 @pytest.fixture
 async def start_kernel(kernel_spec):
-    from jupyter_client.client import KernelClient
-    from jupyter_client.manager import AsyncKernelManager, start_new_async_kernel
-
     km = None
     kc = None
 
