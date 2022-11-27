@@ -1,6 +1,5 @@
 from unittest.mock import Mock
 
-import pytest
 from jupyter_client.session import Session
 
 from pytest_jupyter.echo_kernel import EchoKernel
@@ -10,7 +9,6 @@ def test_zmq_context(zmq_context):
     assert isinstance(zmq_context.underlying, int)
 
 
-@pytest.mark.asyncio
 async def test_start_kernel(start_kernel):
     km, kc = await start_kernel()
     assert km.kernel_name == "echo"

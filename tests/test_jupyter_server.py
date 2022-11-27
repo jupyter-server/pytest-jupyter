@@ -2,30 +2,25 @@ import json
 import os
 from unittest.mock import MagicMock
 
-import pytest
 from jupyter_server.auth import Authorizer
 from jupyter_server.serverapp import ServerApp
 from tornado.websocket import WebSocketHandler
 
 
-@pytest.mark.asyncio
 async def test_serverapp(jp_serverapp):
     assert isinstance(jp_serverapp, ServerApp)
 
 
-@pytest.mark.asyncio
 async def test_get_api_spec(jp_fetch):
     response = await jp_fetch("api", "spec.yaml", method="GET")
     assert response.code == 200
 
 
-@pytest.mark.asyncio
 async def test_send_request(send_request):
     code = await send_request("api/spec.yaml", method="GET")
     assert code == 200
 
 
-@pytest.mark.asyncio
 async def test_connection(jp_fetch, jp_ws_fetch, jp_http_port, jp_auth_header):
     # Create kernel
     r = await jp_fetch("api", "kernels", method="POST", body="{}")
@@ -41,7 +36,6 @@ async def test_connection(jp_fetch, jp_ws_fetch, jp_http_port, jp_auth_header):
     ws.close()
 
 
-@pytest.mark.asyncio
 async def test_authorizer(jp_server_authorizer, jp_serverapp, jp_base_url):
     auth: Authorizer = jp_server_authorizer(parent=jp_serverapp)
     assert isinstance(auth, Authorizer)
@@ -56,7 +50,6 @@ async def test_authorizer(jp_server_authorizer, jp_serverapp, jp_base_url):
     assert auth.match_url_to_resource("/api/shutdown") == "server"
 
 
-@pytest.mark.asyncio
 async def test_create_notebook(jp_create_notebook):
     nb = jp_create_notebook("foo.ipynb")
     assert "nbformat" in nb
