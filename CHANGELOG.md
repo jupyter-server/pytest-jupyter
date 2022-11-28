@@ -2,6 +2,22 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.4.1
+
+([Full Changelog](https://github.com/jupyter-server/pytest-jupyter/compare/v0.4.0...16b3797eecb717929148b34d0c3f3fca3d4ef0b0))
+
+### Bugs fixed
+
+- Fix event loop policy handling [#27](https://github.com/jupyter-server/pytest-jupyter/pull/27) ([@blink1073](https://github.com/blink1073))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/pytest-jupyter/graphs/contributors?from=2022-11-27&to=2022-11-28&type=c))
+
+[@blink1073](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Ablink1073+updated%3A2022-11-27..2022-11-28&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.4.0
 
 ([Full Changelog](https://github.com/jupyter-server/pytest-jupyter/compare/v0.2.3...e6b05fed3a3d10627ffe222cd2d3ca9ca1ee7bce))
@@ -15,8 +31,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/pytest-jupyter/graphs/contributors?from=2022-11-27&to=2022-11-27&type=c))
 
 [@blink1073](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Ablink1073+updated%3A2022-11-27..2022-11-27&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.2.3
 
