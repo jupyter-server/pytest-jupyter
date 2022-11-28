@@ -33,14 +33,12 @@ if resource is not None:
     resource.setrlimit(resource.RLIMIT_NOFILE, (soft, hard))
 
 
-if os.name == "nt":
-    asyncio.set_event_loop_policy(
-        asyncio.WindowsSelectorEventLoopPolicy()  # type:ignore[attr-defined]
-    )
-
-
 @pytest.fixture
 def jp_asyncio_loop():
+    if os.name == "nt":
+        asyncio.set_event_loop_policy(
+            asyncio.WindowsSelectorEventLoopPolicy()  # type:ignore[attr-defined]
+        )
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     yield loop
