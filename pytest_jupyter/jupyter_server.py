@@ -9,7 +9,6 @@ import re
 import shutil
 import urllib.parse
 from binascii import hexlify
-from contextlib import closing
 
 import jupyter_core.paths
 import pytest
@@ -25,7 +24,6 @@ try:
     from jupyter_server.extension import serverextension
     from jupyter_server.serverapp import JUPYTER_SERVICE_HANDLERS, ServerApp
     from jupyter_server.utils import url_path_join
-    from pytest_tornasync.plugin import AsyncHTTPServerClient
     from tornado.escape import url_escape
     from tornado.httpclient import HTTPClientError
     from tornado.websocket import WebSocketHandler
@@ -44,13 +42,10 @@ except ImportError:
     )
 
 
-# Bring in core plugins.
+# Bring in local plugins.
 from pytest_jupyter import *  # noqa
+from pytest_jupyter.pytest_tornasync import *  # noqa
 from pytest_jupyter.utils import mkdir
-
-# List of dependencies needed for this plugin.
-pytest_plugins = ["pytest_tornasync"]
-
 
 # Override some of the fixtures from pytest_tornasync
 # The io_loop fixture is overidden in jupyter_core.py so it
@@ -58,36 +53,22 @@ pytest_plugins = ["pytest_tornasync"]
 
 
 @pytest.fixture
-def http_server_client(http_server, io_loop):
-    """
-    Create an asynchronous HTTP client that can fetch from `http_server`.
-    """
-
-    async def get_client():
-        return AsyncHTTPServerClient(http_server=http_server)
-
-    client = io_loop.run_sync(get_client)
-    with closing(client) as context:
-        yield context
-
-
-@pytest.fixture
-def http_server(io_loop, http_server_port, jp_web_app):
+def jp_http_server(jp_io_loop, jp_http_server_port, jp_web_app):
     """Start a tornado HTTP server that listens on all available interfaces."""
 
     async def get_server():
         server = tornado.httpserver.HTTPServer(jp_web_app)
-        server.add_socket(http_server_port[0])
+        server.add_socket(jp_http_server_port[0])
         return server
 
-    server = io_loop.run_sync(get_server)
+    server = jp_io_loop.run_sync(get_server)
     yield server
     server.stop()
 
     if hasattr(server, "close_all_connections"):
-        io_loop.run_sync(server.close_all_connections)
+        jp_io_loop.run_sync(server.close_all_connections)
 
-    http_server_port[0].close()
+    jp_http_server_port[0].close()
 
 
 # End pytest_tornasync overrides
@@ -126,10 +107,10 @@ def jp_argv():
 
 
 @pytest.fixture()
-def jp_http_port(http_server_port):
+def jp_http_port(jp_http_server_port):
     """Returns the port value from the http_server_port fixture."""
-    yield http_server_port[-1]
-    http_server_port[0].close()
+    yield jp_http_server_port[-1]
+    jp_http_server_port[0].close()
 
 
 @pytest.fixture
@@ -186,7 +167,7 @@ def jp_configurable_serverapp(
     jp_root_dir,
     jp_logging_stream,
     jp_asyncio_loop,
-    io_loop,
+    jp_io_loop,
 ):
     """Starts a Jupyter Server instance based on
     the provided configuration values.
@@ -216,7 +197,7 @@ def jp_configurable_serverapp(
         environ=jp_environ,
         http_port=jp_http_port,
         tmp_path=tmp_path,
-        io_loop=io_loop,
+        io_loop=jp_io_loop,
         root_dir=jp_root_dir,
         **kwargs,
     ):
@@ -301,7 +282,7 @@ def jp_base_url():
 
 
 @pytest.fixture
-def jp_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_base_url):
+def jp_fetch(jp_serverapp, jp_http_server_client, jp_auth_header, jp_base_url):
     """Sends an (asynchronous) HTTP request to a test server.
     The fixture is a factory; it can be called like
     a function inside a unit test. Here's a basic
@@ -328,14 +309,13 @@ def jp_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_base_url):
         for key, value in jp_auth_header.items():
             headers.setdefault(key, value)
         # Make request.
-        print(id(http_server_client.io_loop.asyncio_loop))
-        return http_server_client.fetch(url, headers=headers, request_timeout=20, **kwargs)
+        return jp_http_server_client.fetch(url, headers=headers, request_timeout=20, **kwargs)
 
     return client_fetch
 
 
 @pytest.fixture
-def jp_ws_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_http_port, jp_base_url):
+def jp_ws_fetch(jp_serverapp, jp_http_server_client, jp_auth_header, jp_http_port, jp_base_url):
     """Sends a websocket request to a test server.
     The fixture is a factory; it can be called like
     a function inside a unit test. Here's a basic

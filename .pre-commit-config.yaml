@@ -70,12 +70,6 @@ repos:
           ["flake8-bugbear==22.6.22", "flake8-implicit-str-concat==0.2.0"]
         stages: [manual]
 
-  - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.28.0
-    hooks:
-      - id: eslint
-        stages: [manual]
-
   - repo: https://github.com/python-jsonschema/check-jsonschema
     rev: 0.19.2
     hooks:
