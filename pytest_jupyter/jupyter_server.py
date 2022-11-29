@@ -51,6 +51,7 @@ from pytest_jupyter.utils import mkdir
 # The io_loop fixture is overidden in jupyter_core.py so it
 # can be shared by other plugins that need it (e.g. jupyter_client.py).
 
+
 @pytest.fixture
 def jp_http_server(jp_io_loop, jp_http_server_port, jp_web_app):
     """Start a tornado HTTP server that listens on all available interfaces."""

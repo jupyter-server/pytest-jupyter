@@ -34,9 +34,7 @@ def pytest_pyfunc_call(pyfuncitem):
     except KeyError:
         loop = tornado.ioloop.IOLoop.current()
 
-    loop.run_sync(
-        lambda: pyfuncitem.obj(**testargs)
-    )
+    loop.run_sync(lambda: pyfuncitem.obj(**testargs))
     return True
 
 
@@ -62,7 +60,6 @@ def jp_http_server_client(jp_http_server, jp_io_loop):
         yield context
 
 
-
 class AsyncHTTPServerClient(SimpleAsyncHTTPClient):
     def initialize(self, *, http_server=None):
         super().initialize()
@@ -83,4 +80,4 @@ class AsyncHTTPServerClient(SimpleAsyncHTTPClient):
             return sock.getsockname()[1]
 
     def get_url(self, path):
-        return "%s://127.0.0.1:%s%s" % (self.get_protocol(), self.get_http_port(), path)
+        return f"{self.get_protocol()}://127.0.0.1:{self.get_http_port()}{path}"
