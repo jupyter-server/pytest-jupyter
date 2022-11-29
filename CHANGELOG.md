@@ -2,6 +2,24 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.5.0
+
+([Full Changelog](https://github.com/jupyter-server/pytest-jupyter/compare/v0.4.1...10cf9ca3f7256e9793059838a5d2acc9763ab982))
+
+### Enhancements made
+
+- Inline pytest_tornasync and add downstream tests [#30](https://github.com/jupyter-server/pytest-jupyter/pull/30) ([@blink1073](https://github.com/blink1073))
+
+### Other merged PRs
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/pytest-jupyter/graphs/contributors?from=2022-11-28&to=2022-11-29&type=c))
+
+[@blink1073](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Ablink1073+updated%3A2022-11-28..2022-11-29&type=Issues) | [@codecov](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Acodecov+updated%3A2022-11-28..2022-11-29&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Apre-commit-ci+updated%3A2022-11-28..2022-11-29&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.4.1
 
 ([Full Changelog](https://github.com/jupyter-server/pytest-jupyter/compare/v0.4.0...16b3797eecb717929148b34d0c3f3fca3d4ef0b0))
@@ -15,8 +33,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/pytest-jupyter/graphs/contributors?from=2022-11-27&to=2022-11-28&type=c))
 
 [@blink1073](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Ablink1073+updated%3A2022-11-27..2022-11-28&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.4.0
 
