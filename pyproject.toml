@@ -20,13 +20,17 @@ keywords = [
     "pytest",
 ]
 classifiers = [
-    "Framework :: Pytest",
+    "Development Status :: 4 - Beta",
+    "Framework :: Jupyter",
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
 ]
 dependencies = [
     "pytest",
     "jupyter_core"
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.7"
 
 
 [project.optional-dependencies]
@@ -50,6 +54,9 @@ test = [
 
 [project.urls]
 Homepage = "http://jupyter.org"
+Funding = "https://numfocus.org/donate"
+Source = "https://github.com/jupyter-server/pytest-jupyter"
+Tracker = "https://github.com/jupyter-server/pytest-jupyter/issues"
 
 [tool.hatch.version]
 path = "pytest_jupyter/_version.py"
