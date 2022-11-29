@@ -16,8 +16,9 @@ except ImportError:
         "you need. Try: `pip install 'pytest-jupyter[client]'`"
     )
 
-# Bring in core plugins.
+# Bring in local plugins.
 from pytest_jupyter import *  # noqa
+from pytest_jupyter.pytest_tornasync import *  # noqa
 
 
 @pytest.fixture

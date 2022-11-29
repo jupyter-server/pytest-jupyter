@@ -37,8 +37,7 @@ docs = [
 ]
 client = [
     "jupyter_client>=7.4.0",
-    "ipykernel>=6.14",
-    "pytest-tornasync>=0.6"
+    "ipykernel>=6.14"
 ]
 server = [
     "jupyter_server>=1.21",
@@ -94,8 +93,6 @@ timeout_method = "thread"
 filterwarnings= [
   # Fail on warnings
   "error",
-  # TODO: from jupyter_server
-  "always:unclosed <socket.socket:ResourceWarning"
 ]
 
 [tool.coverage.report]

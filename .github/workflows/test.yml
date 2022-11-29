@@ -120,6 +120,26 @@ jobs:
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
       - uses: jupyterlab/maintainer-tools/.github/actions/check-links@v1
 
+  jupyter_server_downstream:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v3
+      - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+      - uses: jupyterlab/maintainer-tools/.github/actions/downstream-test@v1
+        with:
+          package_name: jupyter_server
+
+  jupyter_client_downstream:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v3
+      - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+      - uses: jupyterlab/maintainer-tools/.github/actions/downstream-test@v1
+        with:
+          package_name: jupyter_client
+
   tests_check: # This job does nothing and is only used for the branch protection
     if: always()
     needs:
@@ -130,6 +150,8 @@ jobs:
       - test_prereleases
       - check_links
       - check_release
+      - jupyter_server_downstream
+      - jupyter_client_downstream
       - test_sdist
     runs-on: ubuntu-latest
     steps:
