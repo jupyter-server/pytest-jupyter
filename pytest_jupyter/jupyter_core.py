@@ -46,7 +46,7 @@ def jp_asyncio_loop():
 
 
 @pytest.fixture(autouse=True)
-def jp_io_loop(jp_asyncio_loop):
+def io_loop(jp_asyncio_loop):
     """Override the io_loop for pytest_tornasync.  This is a no-op
     if tornado is not installed."""
 

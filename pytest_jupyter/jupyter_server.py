@@ -53,22 +53,22 @@ from pytest_jupyter.utils import mkdir
 
 
 @pytest.fixture
-def jp_http_server(jp_io_loop, jp_http_server_port, jp_web_app):
+def http_server(io_loop, http_server_port, jp_web_app):
     """Start a tornado HTTP server that listens on all available interfaces."""
 
     async def get_server():
         server = tornado.httpserver.HTTPServer(jp_web_app)
-        server.add_socket(jp_http_server_port[0])
+        server.add_socket(http_server_port[0])
         return server
 
-    server = jp_io_loop.run_sync(get_server)
+    server = io_loop.run_sync(get_server)
     yield server
     server.stop()
 
     if hasattr(server, "close_all_connections"):
-        jp_io_loop.run_sync(server.close_all_connections)
+        io_loop.run_sync(server.close_all_connections)
 
-    jp_http_server_port[0].close()
+    http_server_port[0].close()
 
 
 # End pytest_tornasync overrides
@@ -107,10 +107,10 @@ def jp_argv():
 
 
 @pytest.fixture()
-def jp_http_port(jp_http_server_port):
+def http_port(http_server_port):
     """Returns the port value from the http_server_port fixture."""
-    yield jp_http_server_port[-1]
-    jp_http_server_port[0].close()
+    yield http_server_port[-1]
+    http_server_port[0].close()
 
 
 @pytest.fixture
@@ -161,13 +161,13 @@ def jp_configurable_serverapp(
     jp_environ,
     jp_server_config,
     jp_argv,
-    jp_http_port,
+    http_port,
     jp_base_url,
     tmp_path,
     jp_root_dir,
     jp_logging_stream,
     jp_asyncio_loop,
-    jp_io_loop,
+    io_loop,
 ):
     """Starts a Jupyter Server instance based on
     the provided configuration values.
@@ -195,9 +195,9 @@ def jp_configurable_serverapp(
         base_url=jp_base_url,
         argv=jp_argv,
         environ=jp_environ,
-        http_port=jp_http_port,
+        http_port=http_port,
         tmp_path=tmp_path,
-        io_loop=jp_io_loop,
+        io_loop=io_loop,
         root_dir=jp_root_dir,
         **kwargs,
     ):
@@ -282,7 +282,7 @@ def jp_base_url():
 
 
 @pytest.fixture
-def jp_fetch(jp_serverapp, jp_http_server_client, jp_auth_header, jp_base_url):
+def jp_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_base_url):
     """Sends an (asynchronous) HTTP request to a test server.
     The fixture is a factory; it can be called like
     a function inside a unit test. Here's a basic
@@ -309,13 +309,13 @@ def jp_fetch(jp_serverapp, jp_http_server_client, jp_auth_header, jp_base_url):
         for key, value in jp_auth_header.items():
             headers.setdefault(key, value)
         # Make request.
-        return jp_http_server_client.fetch(url, headers=headers, request_timeout=20, **kwargs)
+        return http_server_client.fetch(url, headers=headers, request_timeout=20, **kwargs)
 
     return client_fetch
 
 
 @pytest.fixture
-def jp_ws_fetch(jp_serverapp, jp_http_server_client, jp_auth_header, jp_http_port, jp_base_url):
+def jp_ws_fetch(jp_serverapp, http_server_client, jp_auth_header, http_port, jp_base_url):
     """Sends a websocket request to a test server.
     The fixture is a factory; it can be called like
     a function inside a unit test. Here's a basic
@@ -348,7 +348,7 @@ def jp_ws_fetch(jp_serverapp, jp_http_server_client, jp_auth_header, jp_http_por
         # Handle URL strings
         path_url = url_escape(url_path_join(*parts), plus=False)
         base_path_url = url_path_join(jp_base_url, path_url)
-        urlparts = urllib.parse.urlparse(f"ws://localhost:{jp_http_port}")
+        urlparts = urllib.parse.urlparse(f"ws://localhost:{http_port}")
         urlparts = urlparts._replace(path=base_path_url, query=urllib.parse.urlencode(params))
         url = urlparts.geturl()
         # Add auth keys to header
