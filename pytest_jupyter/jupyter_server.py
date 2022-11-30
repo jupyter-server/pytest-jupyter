@@ -107,7 +107,7 @@ def jp_argv():
 
 
 @pytest.fixture()
-def http_port(http_server_port):
+def jp_http_port(http_server_port):
     """Returns the port value from the http_server_port fixture."""
     yield http_server_port[-1]
     http_server_port[0].close()
@@ -161,7 +161,7 @@ def jp_configurable_serverapp(
     jp_environ,
     jp_server_config,
     jp_argv,
-    http_port,
+    jp_http_port,
     jp_base_url,
     tmp_path,
     jp_root_dir,
@@ -195,7 +195,7 @@ def jp_configurable_serverapp(
         base_url=jp_base_url,
         argv=jp_argv,
         environ=jp_environ,
-        http_port=http_port,
+        http_port=jp_http_port,
         tmp_path=tmp_path,
         io_loop=io_loop,
         root_dir=jp_root_dir,
@@ -222,7 +222,7 @@ def jp_configurable_serverapp(
         app = ServerApp.instance(
             # Set the log level to debug for testing purposes
             log_level="DEBUG",
-            port=http_port,
+            port=jp_http_port,
             port_retries=0,
             open_browser=False,
             base_url=base_url,
@@ -315,7 +315,7 @@ def jp_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_base_url):
 
 
 @pytest.fixture
-def jp_ws_fetch(jp_serverapp, http_server_client, jp_auth_header, http_port, jp_base_url):
+def jp_ws_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_http_port, jp_base_url):
     """Sends a websocket request to a test server.
     The fixture is a factory; it can be called like
     a function inside a unit test. Here's a basic
@@ -348,7 +348,7 @@ def jp_ws_fetch(jp_serverapp, http_server_client, jp_auth_header, http_port, jp_
         # Handle URL strings
         path_url = url_escape(url_path_join(*parts), plus=False)
         base_path_url = url_path_join(jp_base_url, path_url)
-        urlparts = urllib.parse.urlparse(f"ws://localhost:{http_port}")
+        urlparts = urllib.parse.urlparse(f"ws://localhost:{jp_http_port}")
         urlparts = urlparts._replace(path=base_path_url, query=urllib.parse.urlencode(params))
         url = urlparts.geturl()
         # Add auth keys to header
