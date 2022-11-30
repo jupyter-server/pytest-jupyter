@@ -30,7 +30,7 @@ def pytest_pyfunc_call(pyfuncitem):
         return True
 
     try:
-        loop = funcargs["jp_io_loop"]
+        loop = funcargs["io_loop"]
     except KeyError:
         loop = tornado.ioloop.IOLoop.current()
 
@@ -39,7 +39,7 @@ def pytest_pyfunc_call(pyfuncitem):
 
 
 @pytest.fixture
-def jp_http_server_port():
+def http_server_port():
     """
     Port used by `http_server`.
     """
@@ -47,15 +47,15 @@ def jp_http_server_port():
 
 
 @pytest.fixture
-def jp_http_server_client(jp_http_server, jp_io_loop):
+def http_server_client(http_server, io_loop):
     """
     Create an asynchronous HTTP client that can fetch from `http_server`.
     """
 
     async def get_client():
-        return AsyncHTTPServerClient(http_server=jp_http_server)
+        return AsyncHTTPServerClient(http_server=http_server)
 
-    client = jp_io_loop.run_sync(get_client)
+    client = io_loop.run_sync(get_client)
     with closing(client) as context:
         yield context
 
