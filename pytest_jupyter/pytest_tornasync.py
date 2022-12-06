@@ -9,7 +9,7 @@ try:
     import tornado.testing
     from tornado.simple_httpclient import SimpleAsyncHTTPClient
 except ImportError:
-    SimpleAsyncHTTPClient = object
+    SimpleAsyncHTTPClient = object  # type:ignore
 
 import pytest
 

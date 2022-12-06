@@ -6,6 +6,8 @@ from jupyter_server.auth import Authorizer
 from jupyter_server.serverapp import ServerApp
 from tornado.websocket import WebSocketHandler
 
+from pytest_jupyter.jupyter_server import _Authorizer
+
 
 async def test_serverapp(jp_serverapp):
     assert isinstance(jp_serverapp, ServerApp)
@@ -37,7 +39,7 @@ async def test_connection(jp_fetch, jp_ws_fetch, jp_http_port, jp_auth_header):
 
 
 async def test_authorizer(jp_server_authorizer, jp_serverapp, jp_base_url):
-    auth: Authorizer = jp_server_authorizer(parent=jp_serverapp)
+    auth: _Authorizer = jp_server_authorizer(parent=jp_serverapp)
     assert isinstance(auth, Authorizer)
     assert auth.normalize_url("foo") == "/foo"
     assert auth.normalize_url(f"{jp_base_url}/foo") == "/foo"
