@@ -32,6 +32,7 @@ try:
     is_v2 = version_info[0] == 2
 
 except ImportError:
+    Authorizer = object  # type:ignore
     import warnings
 
     warnings.warn(
@@ -43,7 +44,7 @@ except ImportError:
 
 
 # Bring in local plugins.
-from pytest_jupyter import *  # noqa
+from pytest_jupyter.jupyter_core import *  # noqa
 from pytest_jupyter.pytest_tornasync import *  # noqa
 from pytest_jupyter.utils import mkdir
 
@@ -151,7 +152,7 @@ def jp_logging_stream():
     output = logging_stream.getvalue()
     # If output exists, print it.
     if output:
-        print(output)
+        print(output)  # noqa
     return output
 
 
@@ -385,7 +386,7 @@ def jp_server_cleanup(jp_asyncio_loop):
     try:
         jp_asyncio_loop.run_until_complete(app._cleanup())
     except (RuntimeError, SystemExit) as e:
-        print("ignoring cleanup error", e)
+        print("ignoring cleanup error", e)  # noqa
     if hasattr(app, "kernel_manager"):
         app.kernel_manager.context.destroy()
     ServerApp.clear_instance()
@@ -436,74 +437,76 @@ def jp_server_auth_resources(jp_server_auth_core_resources):
     return jp_server_auth_core_resources
 
 
+class _Authorizer(Authorizer):
+    # Set these class attributes from within a test
+    # to verify that they match the arguments passed
+    # by the REST API.
+    permissions: dict = {}
+    _default_regex_mapping: dict = {}
+
+    HTTP_METHOD_TO_AUTH_ACTION = {
+        "GET": "read",
+        "HEAD": "read",
+        "OPTIONS": "read",
+        "POST": "write",
+        "PUT": "write",
+        "PATCH": "write",
+        "DELETE": "write",
+        "WEBSOCKET": "execute",
+    }
+
+    def match_url_to_resource(self, url, regex_mapping=None):
+        """Finds the JupyterHandler regex pattern that would
+        match the given URL and returns the resource name (str)
+        of that handler.
+        e.g.
+        /api/contents/... returns "contents"
+        """
+        regex_mapping = regex_mapping or self._default_regex_mapping
+        for regex, auth_resource in regex_mapping.items():
+            pattern = re.compile(regex)
+            if pattern.fullmatch(url):
+                return auth_resource
+
+    def normalize_url(self, path):
+        """Drop the base URL and make sure path leads with a /"""
+        base_url = self.parent.base_url
+        # Remove base_url
+        if path.startswith(base_url):
+            path = path[len(base_url) :]
+        # Make sure path starts with /
+        if not path.startswith("/"):
+            path = "/" + path
+        return path
+
+    def is_authorized(self, handler, user, action, resource):
+        # Parse Request
+        if isinstance(handler, WebSocketHandler):
+            method = "WEBSOCKET"
+        else:
+            method = handler.request.method
+        url = self.normalize_url(handler.request.path)
+
+        # Map request parts to expected action and resource.
+        expected_action = self.HTTP_METHOD_TO_AUTH_ACTION[method]
+        expected_resource = self.match_url_to_resource(url)
+
+        # Assert that authorization layer returns the
+        # correct action + resource.
+        assert action == expected_action
+        assert resource == expected_resource
+
+        # Now, actually apply the authorization layer.
+        return all(
+            [
+                action in self.permissions.get("actions", []),
+                resource in self.permissions.get("resources", []),
+            ]
+        )
+
+
 @pytest.fixture
 def jp_server_authorizer(jp_server_auth_resources):
-    class _(Authorizer):
-
-        # Set these class attributes from within a test
-        # to verify that they match the arguments passed
-        # by the REST API.
-        permissions: dict = {}
-
-        HTTP_METHOD_TO_AUTH_ACTION = {
-            "GET": "read",
-            "HEAD": "read",
-            "OPTIONS": "read",
-            "POST": "write",
-            "PUT": "write",
-            "PATCH": "write",
-            "DELETE": "write",
-            "WEBSOCKET": "execute",
-        }
-
-        def match_url_to_resource(self, url, regex_mapping=None):
-            """Finds the JupyterHandler regex pattern that would
-            match the given URL and returns the resource name (str)
-            of that handler.
-            e.g.
-            /api/contents/... returns "contents"
-            """
-            if not regex_mapping:
-                regex_mapping = jp_server_auth_resources
-            for regex, auth_resource in regex_mapping.items():
-                pattern = re.compile(regex)
-                if pattern.fullmatch(url):
-                    return auth_resource
-
-        def normalize_url(self, path):
-            """Drop the base URL and make sure path leads with a /"""
-            base_url = self.parent.base_url
-            # Remove base_url
-            if path.startswith(base_url):
-                path = path[len(base_url) :]
-            # Make sure path starts with /
-            if not path.startswith("/"):
-                path = "/" + path
-            return path
-
-        def is_authorized(self, handler, user, action, resource):
-            # Parse Request
-            if isinstance(handler, WebSocketHandler):
-                method = "WEBSOCKET"
-            else:
-                method = handler.request.method
-            url = self.normalize_url(handler.request.path)
-
-            # Map request parts to expected action and resource.
-            expected_action = self.HTTP_METHOD_TO_AUTH_ACTION[method]
-            expected_resource = self.match_url_to_resource(url)
-
-            # Assert that authorization layer returns the
-            # correct action + resource.
-            assert action == expected_action
-            assert resource == expected_resource
-
-            # Now, actually apply the authorization layer.
-            return all(
-                [
-                    action in self.permissions.get("actions", []),
-                    resource in self.permissions.get("resources", []),
-                ]
-            )
-
-    return _
+    auth_klass = _Authorizer
+    auth_klass._default_regex_mapping = jp_server_auth_resources
+    return auth_klass
