@@ -510,6 +510,6 @@ class _Authorizer(Authorizer):
 
 @pytest.fixture
 def jp_server_authorizer(jp_server_auth_resources):
-    auth = _Authorizer()
-    auth._default_regex_mapping = jp_server_auth_resources
-    return auth
+    auth_klass = _Authorizer
+    auth_klass._default_regex_mapping = jp_server_auth_resources
+    return auth_klass
