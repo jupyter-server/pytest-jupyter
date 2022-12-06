@@ -9,7 +9,6 @@ import re
 import shutil
 import urllib.parse
 from binascii import hexlify
-from typing import Any
 
 import jupyter_core.paths
 import pytest
@@ -446,7 +445,7 @@ class _Authorizer(Authorizer):
     # to verify that they match the arguments passed
     # by the REST API.
     permissions: dict = {}
-    _default_regex_mapping: Any
+    _default_regex_mapping: dict = {}
 
     HTTP_METHOD_TO_AUTH_ACTION = {
         "GET": "read",
@@ -512,5 +511,5 @@ class _Authorizer(Authorizer):
 @pytest.fixture
 def jp_server_authorizer(jp_server_auth_resources):
     auth = _Authorizer()
-    auth._default_regex_mapping = jp_server_authorizer
+    auth._default_regex_mapping = jp_server_auth_resources
     return auth
