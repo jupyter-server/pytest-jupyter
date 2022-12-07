@@ -5,6 +5,7 @@ import pytest
 
 try:
     import ipykernel  # noqa
+    from jupyter_client.kernelspec import NATIVE_KERNEL_NAME
     from jupyter_client.manager import start_new_async_kernel
 except ImportError:
     import warnings
@@ -35,7 +36,7 @@ def jp_start_kernel(jp_environ, jp_asyncio_loop):
     kms = []
     kcs = []
 
-    async def inner(kernel_name="echo", **kwargs):
+    async def inner(kernel_name=NATIVE_KERNEL_NAME, **kwargs):
         km, kc = await start_new_async_kernel(kernel_name=kernel_name, **kwargs)
         kms.append(km)
         kcs.append(kc)

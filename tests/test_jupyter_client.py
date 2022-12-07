@@ -10,12 +10,12 @@ def test_zmq_context(jp_zmq_context):
 
 
 async def test_start_kernel(jp_start_kernel):
-    km, kc = await jp_start_kernel()
+    km, kc = await jp_start_kernel("echo")
     assert km.kernel_name == "echo"
     msg = await kc.execute("hello", reply=True)
     assert msg["content"]["status"] == "ok"
 
-    km, kc = await jp_start_kernel("python3")
+    km, kc = await jp_start_kernel()
     assert km.kernel_name == "python3"
     msg = await kc.execute("print('hi')", reply=True)
     assert msg["content"]["status"] == "ok"

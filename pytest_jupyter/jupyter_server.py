@@ -205,9 +205,6 @@ def jp_configurable_serverapp(
         c = Config(config)
         c.NotebookNotary.db_file = ":memory:"
 
-        if "default_kernel_name" not in c.MultiKernelManager:
-            c.MultiKernelManager.default_kernel_name = "echo"
-
         default_token = hexlify(os.urandom(4)).decode("ascii")
         if not is_v2:
             kwargs["token"] = default_token
