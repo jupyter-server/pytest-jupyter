@@ -2,6 +2,33 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.6.0
+
+([Full Changelog](https://github.com/jupyter-server/pytest-jupyter/compare/v0.5.3...0d41f3ff76324b2e158763ee17bb6e3e0075748d))
+
+### Enhancements made
+
+- Use native kernel by default [#36](https://github.com/jupyter-server/pytest-jupyter/pull/36) ([@blink1073](https://github.com/blink1073))
+
+### Bugs fixed
+
+- Fix core import in client [#38](https://github.com/jupyter-server/pytest-jupyter/pull/38) ([@blink1073](https://github.com/blink1073))
+
+### Maintenance and upkeep improvements
+
+- Adopt ruff and address lint [#37](https://github.com/jupyter-server/pytest-jupyter/pull/37) ([@blink1073](https://github.com/blink1073))
+- hoist __version__ [#34](https://github.com/jupyter-server/pytest-jupyter/pull/34) ([@bollwyvl](https://github.com/bollwyvl))
+
+### Other merged PRs
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/pytest-jupyter/graphs/contributors?from=2022-11-30&to=2022-12-07&type=c))
+
+[@blink1073](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Ablink1073+updated%3A2022-11-30..2022-12-07&type=Issues) | [@bollwyvl](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Abollwyvl+updated%3A2022-11-30..2022-12-07&type=Issues) | [@codecov](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Acodecov+updated%3A2022-11-30..2022-12-07&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Apre-commit-ci+updated%3A2022-11-30..2022-12-07&type=Issues) | [@welcome](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Awelcome+updated%3A2022-11-30..2022-12-07&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.5.3
 
 ([Full Changelog](https://github.com/jupyter-server/pytest-jupyter/compare/v0.5.2...4118fd38a44ab56b883699a73e10a5c6e59dbf90))
@@ -15,8 +42,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/pytest-jupyter/graphs/contributors?from=2022-11-30&to=2022-11-30&type=c))
 
 [@blink1073](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Ablink1073+updated%3A2022-11-30..2022-11-30&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.5.2
 
