@@ -14,6 +14,10 @@ async def test_serverapp(jp_serverapp):
     assert isinstance(jp_serverapp, ServerApp)
 
 
+def test_skip(jp_serverapp):
+    pytest.skip("Forcing a skip")
+
+
 async def test_get_api_spec(jp_fetch):
     response = await jp_fetch("api", "spec.yaml", method="GET")
     assert response.code == 200
@@ -64,7 +68,3 @@ def test_template_dir(jp_template_dir):
 
 def test_extension_environ(jp_extension_environ):
     pass
-
-
-def test_skip(jp_serverapp):
-    pytest.skip("Forcing a skip")
