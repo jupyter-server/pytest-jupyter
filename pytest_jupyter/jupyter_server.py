@@ -67,7 +67,10 @@ def http_server(io_loop, http_server_port, jp_web_app):
     server.stop()
 
     if hasattr(server, "close_all_connections"):
-        io_loop.run_sync(server.close_all_connections)
+        try:
+            io_loop.run_sync(server.close_all_connections)
+        except TimeoutError:
+            pass
 
     http_server_port[0].close()
 

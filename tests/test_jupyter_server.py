@@ -2,6 +2,7 @@ import json
 import os
 from unittest.mock import MagicMock
 
+import pytest
 from jupyter_server.auth import Authorizer
 from jupyter_server.serverapp import ServerApp
 from tornado.websocket import WebSocketHandler
@@ -11,6 +12,10 @@ from pytest_jupyter.jupyter_server import _Authorizer
 
 async def test_serverapp(jp_serverapp):
     assert isinstance(jp_serverapp, ServerApp)
+
+
+def test_skip(jp_serverapp):
+    pytest.skip("Forcing a skip")
 
 
 async def test_get_api_spec(jp_fetch):
