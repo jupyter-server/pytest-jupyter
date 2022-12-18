@@ -2,6 +2,7 @@ import json
 import os
 from unittest.mock import MagicMock
 
+import pytest
 from jupyter_server.auth import Authorizer
 from jupyter_server.serverapp import ServerApp
 from tornado.websocket import WebSocketHandler
@@ -63,3 +64,7 @@ def test_template_dir(jp_template_dir):
 
 def test_extension_environ(jp_extension_environ):
     pass
+
+
+def test_skip(jp_serverapp):
+    pytest.skip("Forcing a skip")
