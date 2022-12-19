@@ -2,6 +2,22 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.6.1
+
+([Full Changelog](https://github.com/jupyter-server/pytest-jupyter/compare/v0.6.0...5e9a4ddd9fa138fb00e1738095139a27070558a2))
+
+### Bugs fixed
+
+- Handle TimeoutError During Fixture Shutdown [#40](https://github.com/jupyter-server/pytest-jupyter/pull/40) ([@blink1073](https://github.com/blink1073))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/pytest-jupyter/graphs/contributors?from=2022-12-07&to=2022-12-19&type=c))
+
+[@blink1073](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Ablink1073+updated%3A2022-12-07..2022-12-19&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.6.0
 
 ([Full Changelog](https://github.com/jupyter-server/pytest-jupyter/compare/v0.5.3...0d41f3ff76324b2e158763ee17bb6e3e0075748d))
@@ -26,8 +42,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/pytest-jupyter/graphs/contributors?from=2022-11-30&to=2022-12-07&type=c))
 
 [@blink1073](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Ablink1073+updated%3A2022-11-30..2022-12-07&type=Issues) | [@bollwyvl](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Abollwyvl+updated%3A2022-11-30..2022-12-07&type=Issues) | [@codecov](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Acodecov+updated%3A2022-11-30..2022-12-07&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Apre-commit-ci+updated%3A2022-11-30..2022-12-07&type=Issues) | [@welcome](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Awelcome+updated%3A2022-11-30..2022-12-07&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.5.3
 
