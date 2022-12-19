@@ -2,6 +2,22 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.6.2
+
+([Full Changelog](https://github.com/jupyter-server/pytest-jupyter/compare/v0.6.1...4d3cb820e2ffb435f6b482f1b08bcddce062436d))
+
+### Bugs fixed
+
+- Handle asyncio timeout [#41](https://github.com/jupyter-server/pytest-jupyter/pull/41) ([@blink1073](https://github.com/blink1073))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/pytest-jupyter/graphs/contributors?from=2022-12-19&to=2022-12-19&type=c))
+
+[@blink1073](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Ablink1073+updated%3A2022-12-19..2022-12-19&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.6.1
 
 ([Full Changelog](https://github.com/jupyter-server/pytest-jupyter/compare/v0.6.0...5e9a4ddd9fa138fb00e1738095139a27070558a2))
@@ -15,8 +31,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/pytest-jupyter/graphs/contributors?from=2022-12-07&to=2022-12-19&type=c))
 
 [@blink1073](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Ablink1073+updated%3A2022-12-07..2022-12-19&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.6.0
 
