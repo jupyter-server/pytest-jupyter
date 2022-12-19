@@ -1,6 +1,7 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
+import asyncio
 import importlib
 import io
 import logging
@@ -69,7 +70,7 @@ def http_server(io_loop, http_server_port, jp_web_app):
     if hasattr(server, "close_all_connections"):
         try:
             io_loop.run_sync(server.close_all_connections)
-        except TimeoutError:
+        except asyncio.TimeoutError:
             pass
 
     http_server_port[0].close()
