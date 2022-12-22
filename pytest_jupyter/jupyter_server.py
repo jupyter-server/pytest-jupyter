@@ -1,3 +1,4 @@
+"""Fixtures for use with jupyter server and downstream."""
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
@@ -59,6 +60,7 @@ def http_server(io_loop, http_server_port, jp_web_app):
     """Start a tornado HTTP server that listens on all available interfaces."""
 
     async def get_server():
+        """Get a server asynchronously."""
         server = tornado.httpserver.HTTPServer(jp_web_app)
         server.add_socket(http_server_port[0])
         return server
@@ -385,6 +387,7 @@ def jp_create_notebook(jp_root_dir):
 
 @pytest.fixture(autouse=True)
 def jp_server_cleanup(jp_asyncio_loop):
+    """Automatically cleans up server resources."""
     yield
     app: ServerApp = ServerApp.instance()
     try:
@@ -422,6 +425,7 @@ def send_request(jp_fetch, jp_ws_fetch):
 
 @pytest.fixture
 def jp_server_auth_core_resources():
+    """The core auth resources for use with a server."""
     modules = []
     for mod_name in JUPYTER_SERVICE_HANDLERS.values():
         if mod_name:
@@ -438,10 +442,13 @@ def jp_server_auth_core_resources():
 
 @pytest.fixture
 def jp_server_auth_resources(jp_server_auth_core_resources):
+    """The auth resources used by the server."""
     return jp_server_auth_core_resources
 
 
 class _Authorizer(Authorizer):
+    """A custom authorizer class for testing."""
+
     # Set these class attributes from within a test
     # to verify that they match the arguments passed
     # by the REST API.
@@ -484,6 +491,7 @@ class _Authorizer(Authorizer):
         return path
 
     def is_authorized(self, handler, user, action, resource):
+        """Test if a request is authorized."""
         # Parse Request
         if isinstance(handler, WebSocketHandler):
             method = "WEBSOCKET"
@@ -511,6 +519,7 @@ class _Authorizer(Authorizer):
 
 @pytest.fixture
 def jp_server_authorizer(jp_server_auth_resources):
+    """An authorizer for the server."""
     auth_klass = _Authorizer
     auth_klass._default_regex_mapping = jp_server_auth_resources
     return auth_klass

@@ -32,6 +32,14 @@ extensions = [
     "sphinx.ext.autodoc",
 ]
 
+try:
+    import enchant  # type:ignore  # noqa
+
+    extensions += ["sphinxcontrib.spelling"]
+except ImportError:
+    pass
+
+
 # Autodoc fixtures
 # If true, the current module name will be prepended to all description
 # unit titles (such as .. function::).

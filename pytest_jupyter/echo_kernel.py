@@ -1,3 +1,4 @@
+"""A simple echo kernel."""
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
@@ -8,6 +9,8 @@ from ipykernel.kernelbase import Kernel
 
 
 class EchoKernel(Kernel):
+    """An echo kernel."""
+
     implementation = "Echo"
     implementation_version = "1.0"
     language = "echo"
@@ -22,6 +25,7 @@ class EchoKernel(Kernel):
     def do_execute(
         self, code, silent, store_history=True, user_expressions=None, allow_stdin=False
     ):
+        """Execute code on the kernel."""
         if not silent:
             stream_content = {"name": "stdout", "text": code}
             self.send_response(self.iopub_socket, "stream", stream_content)
@@ -45,6 +49,8 @@ class EchoKernel(Kernel):
 
 
 class EchoKernelApp(IPKernelApp):
+    """An app for the echo kernel."""
+
     kernel_class = EchoKernel
 
 

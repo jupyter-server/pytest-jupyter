@@ -1,3 +1,4 @@
+"""Fixtures for use with jupyter_client and downstream."""
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
@@ -24,6 +25,7 @@ from pytest_jupyter.pytest_tornasync import *  # noqa
 
 @pytest.fixture
 def jp_zmq_context():
+    """Get a zmq context."""
     import zmq
 
     ctx = zmq.asyncio.Context()
@@ -33,10 +35,12 @@ def jp_zmq_context():
 
 @pytest.fixture
 def jp_start_kernel(jp_environ, jp_asyncio_loop):
+    """Get a function to a kernel and clean up resources when done."""
     kms = []
     kcs = []
 
     async def inner(kernel_name=NATIVE_KERNEL_NAME, **kwargs):
+        """A function used to start a kernel."""
         km, kc = await start_new_async_kernel(kernel_name=kernel_name, **kwargs)
         kms.append(km)
         kcs.append(kc)
