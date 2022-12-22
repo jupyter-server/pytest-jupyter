@@ -1,3 +1,4 @@
+"""Fixtures for use with jupyter core and downstream."""
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 import asyncio
@@ -35,6 +36,7 @@ if resource is not None:
 
 @pytest.fixture
 def jp_asyncio_loop():
+    """Get an asyncio loop."""
     if os.name == "nt":
         asyncio.set_event_loop_policy(
             asyncio.WindowsSelectorEventLoopPolicy()  # type:ignore[attr-defined]
@@ -51,6 +53,7 @@ def io_loop(jp_asyncio_loop):
     if tornado is not installed."""
 
     async def get_tornado_loop():
+        """Asynchronously get a tornado loop."""
         try:
             from tornado.ioloop import IOLoop
 
@@ -111,11 +114,13 @@ def jp_env_config_path(tmp_path):
 
 @pytest.fixture()
 def jp_kernel_dir(jp_data_dir):
+    """Get the directory for kernel specs."""
     return mkdir(jp_data_dir, "kernels")
 
 
 @pytest.fixture
 def echo_kernel_spec(jp_kernel_dir):
+    """Install a kernel spec for the echo kernel."""
     test_dir = Path(jp_kernel_dir) / "echo"
     test_dir.mkdir(parents=True, exist_ok=True)
     argv = [sys.executable, "-m", "pytest_jupyter.echo_kernel", "-f", "{connection_file}"]

@@ -38,6 +38,7 @@ docs = [
     "myst_parser",
     "pydata_sphinx_theme",
     "Sphinx",
+    "sphinxcontrib-spelling"
 ]
 client = [
     "jupyter_client>=7.4.0",
@@ -52,9 +53,9 @@ test = [
     "pytest-timeout"
 ]
 lint = [
-  "black>=22.6.0",
+  "black[jupyter]==22.1-.0",
   "mdformat>0.7",
-  "ruff>=0.0.156",
+  "ruff==0.0.189",
 ]
 typing = [
     "mypy>=0.990"
@@ -216,3 +217,13 @@ unfixable = [
 # B007 Loop control variable `i` not used within the loop body.
 # N802 Function name `assertIn` should be lowercase
 "tests/*" = ["B011", "F841", "C408", "E402", "T201", "B007", "N802"]
+
+[tool.interrogate]
+ignore-init-module=true
+ignore-private=true
+ignore-semiprivate=true
+ignore-property-decorators=true
+ignore-nested-functions=true
+ignore-nested-classes=true
+fail-under=100
+exclude = ["docs", "tests"]
