@@ -88,7 +88,7 @@ test = "coverage run -m pytest {args}"
 nowarn = "test -W default {args}"
 
 [tool.hatch.envs.typing]
-features = ["test", "typing", "server", "client"]
+features = ["test", "server", "client"]
 dependencies = ["mypy>=0.990"]
 [tool.hatch.envs.typing.scripts]
 test = "mypy --install-types --non-interactive {args:.}"
