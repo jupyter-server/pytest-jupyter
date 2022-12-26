@@ -55,7 +55,7 @@ test = [
 lint = [
   "black[jupyter]==22.10.0",
   "mdformat>0.7",
-  "ruff==0.0.189",
+  "ruff==0.0.194",
 ]
 typing = [
     "mypy>=0.990"
