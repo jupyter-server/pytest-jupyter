@@ -372,7 +372,8 @@ def jp_create_notebook(jp_root_dir):
         nbpath = jp_root_dir.joinpath(nbpath)
         # Check that the notebook has the correct file extension.
         if nbpath.suffix != ".ipynb":
-            raise Exception("File extension for notebook must be .ipynb")
+            msg = "File extension for notebook must be .ipynb"
+            raise Exception(msg)
         # If the notebook path has a parent directory, make sure it's created.
         parent = nbpath.parent
         parent.mkdir(parents=True, exist_ok=True)

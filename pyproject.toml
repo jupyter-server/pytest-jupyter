@@ -52,14 +52,6 @@ server = [
 test = [
     "pytest-timeout"
 ]
-lint = [
-  "black[jupyter]==22.12.0",
-  "mdformat>0.7",
-  "ruff==0.0.194",
-]
-typing = [
-    "mypy>=0.990"
-]
 
 [project.urls]
 Homepage = "http://jupyter.org"
@@ -96,13 +88,18 @@ test = "coverage run -m pytest {args}"
 nowarn = "test -W default {args}"
 
 [tool.hatch.envs.typing]
-features = ["test", "typing", "server", "client"]
+features = ["test", "server", "client"]
 dependencies = ["mypy>=0.990"]
 [tool.hatch.envs.typing.scripts]
 test = "mypy --install-types --non-interactive {args:.}"
 
 [tool.hatch.envs.lint]
-features = ["lint"]
+dependencies = [
+  "black[jupyter]==22.12.0",
+  "mdformat>0.7",
+  "ruff==0.0.194",
+]
+detached = true
 [tool.hatch.envs.lint.scripts]
 style = [
   "ruff {args:.}",
@@ -168,7 +165,7 @@ target-version = ["py38"]
 target-version = "py38"
 line-length = 100
 select = [
-  "A", "B", "C", "E", "F", "FBT", "I", "N", "Q", "RUF", "S", "T",
+  "A", "B", "C", "E", "EM", "F", "FBT", "I", "N", "Q", "RUF", "S", "T",
   "UP", "W", "YTT",
 ]
 ignore = [
