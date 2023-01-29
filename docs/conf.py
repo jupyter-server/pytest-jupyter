@@ -18,7 +18,7 @@
 # -- Project information -----------------------------------------------------
 
 project = "pytest-jupyter"
-copyright = "2020, Project Jupyter"
+copyright = "2020, Project Jupyter"  # noqa
 author = "Project Jupyter"
 
 

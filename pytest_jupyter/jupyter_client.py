@@ -53,4 +53,5 @@ def jp_start_kernel(jp_environ, jp_asyncio_loop):
 
     for km in kms:
         jp_asyncio_loop.run_until_complete(km.shutdown_kernel(now=True))
-        assert km.context.closed
+        if not km.context.closed:
+            raise AssertionError

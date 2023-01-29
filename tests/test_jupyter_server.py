@@ -20,12 +20,12 @@ def test_skip(jp_serverapp):
 
 async def test_get_api_spec(jp_fetch):
     response = await jp_fetch("api", "spec.yaml", method="GET")
-    assert response.code == 200
+    assert response.code == 200  # noqa
 
 
 async def test_send_request(send_request):
     code = await send_request("api/spec.yaml", method="GET")
-    assert code == 200
+    assert code == 200  # noqa
 
 
 async def test_connection(jp_fetch, jp_ws_fetch, jp_http_port, jp_auth_header):
