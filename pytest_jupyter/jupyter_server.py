@@ -158,7 +158,7 @@ def jp_logging_stream():
     output = logging_stream.getvalue()
     # If output exists, print it.
     if output:
-        print(output)  # noqa
+        print(output)
     return output
 
 
@@ -394,7 +394,7 @@ def jp_server_cleanup(jp_asyncio_loop):
     try:
         jp_asyncio_loop.run_until_complete(app._cleanup())
     except (RuntimeError, SystemExit) as e:
-        print("ignoring cleanup error", e)  # noqa
+        print("ignoring cleanup error", e)
     if hasattr(app, "kernel_manager"):
         app.kernel_manager.context.destroy()
     ServerApp.clear_instance()
