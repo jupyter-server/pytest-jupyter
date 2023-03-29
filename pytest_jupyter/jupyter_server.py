@@ -355,8 +355,9 @@ def jp_ws_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_http_port, 
         urlparts = urllib.parse.urlparse(f"ws://localhost:{jp_http_port}")
         urlparts = urlparts._replace(path=base_path_url, query=urllib.parse.urlencode(params))
         url = urlparts.geturl()
-        # Add auth keys to header
-        headers.update(jp_auth_header)
+        # Add auth keys to header, if not overridden
+        for key, value in jp_auth_header.items():
+            headers.setdefault(key, value)
         # Make request.
         req = tornado.httpclient.HTTPRequest(url, headers=headers, connect_timeout=120)
         return tornado.websocket.websocket_connect(req)
