@@ -15,7 +15,8 @@ except ImportError:
         "The client plugin has not been installed. "
         "If you're trying to use this plugin and you've installed "
         "`pytest-jupyter`, there is likely one more step "
-        "you need. Try: `pip install 'pytest-jupyter[client]'`", stacklevel=2
+        "you need. Try: `pip install 'pytest-jupyter[client]'`",
+        stacklevel=2,
     )
 
 # Bring in local plugins.

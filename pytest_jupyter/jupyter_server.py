@@ -41,7 +41,8 @@ except ImportError:
         "The server plugin has not been installed. "
         "If you're trying to use this plugin and you've installed "
         "`pytest-jupyter`, there is likely one more step "
-        "you need. Try: `pip install 'pytest-jupyter[server]'`", stacklevel=2
+        "you need. Try: `pip install 'pytest-jupyter[server]'`",
+        stacklevel=2,
     )
 
 
