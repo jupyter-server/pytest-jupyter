@@ -41,7 +41,7 @@ except ImportError:
         "The server plugin has not been installed. "
         "If you're trying to use this plugin and you've installed "
         "`pytest-jupyter`, there is likely one more step "
-        "you need. Try: `pip install 'pytest-jupyter[server]'`"
+        "you need. Try: `pip install 'pytest-jupyter[server]'`", stacklevel=2
     )
 
 
@@ -158,7 +158,7 @@ def jp_logging_stream():
     output = logging_stream.getvalue()
     # If output exists, print it.
     if output:
-        print(output)
+        print(output)  # noqa
     return output
 
 
@@ -395,7 +395,7 @@ def jp_server_cleanup(jp_asyncio_loop):
     try:
         jp_asyncio_loop.run_until_complete(app._cleanup())
     except (RuntimeError, SystemExit) as e:
-        print("ignoring cleanup error", e)
+        print("ignoring cleanup error", e)  # noqa
     if hasattr(app, "kernel_manager"):
         app.kernel_manager.context.destroy()
     ServerApp.clear_instance()
