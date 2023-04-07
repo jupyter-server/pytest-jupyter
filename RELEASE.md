@@ -25,7 +25,8 @@ git clean -dffx
 echo "Enter new version"
 read new_version
 hatch version ${new_version}
-git tag -a ${new_version} -m "Release ${new_version}"
+git commit -a -m "Release ${new_version}"
+git tag -a v${new_version} -m "Release ${new_version}"
 ```
 
 ### Build the artifacts
@@ -41,7 +42,8 @@ python -m build .
 echo "Enter dev version"
 read dev_version
 hatch version ${dev_version}
-git push origin $(git branch --show-current)
+git commit -a -m "Prepare for next release"
+git push origin $(git branch --show-current) v${new_version}
 ```
 
 ### Publish the artifacts to pypi
