@@ -3,7 +3,6 @@
 A set of pytest plugins for Jupyter libraries and extensions.
 
 [![Build Status](https://github.com/jupyter-server/pytest-jupyter/actions/workflows/test.yml/badge.svg?query=branch%3Amain++)](https://github.com/jupyter-server/pytest-jupyter/actions/workflows/test.yml/badge.svg?query=branch%3Amain++)
-[![codecov](https://codecov.io/gh/jupyter-server/pytest-jupyter/branch/main/graph/badge.svg?token=2MY8C1A777)](https://codecov.io/gh/jupyter-server/pytest-jupyter)
 
 ## Basic Usage
 

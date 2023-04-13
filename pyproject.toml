@@ -142,6 +142,10 @@ exclude_lines = [
   "@(abc\\.)?abstractmethod",
 ]
 
+[tool.coverage.run]
+relative_files = true
+source = ["pytest_jupyter"]
+
 [tool.mypy]
 check_untyped_defs = true
 disallow_incomplete_defs = true
