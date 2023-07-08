@@ -97,7 +97,7 @@ test = "mypy --install-types --non-interactive {args:.}"
 dependencies = [
   "black[jupyter]==23.3.0",
   "mdformat>0.7",
-  "ruff==0.0.263",
+  "ruff==0.0.276",
 ]
 detached = true
 [tool.hatch.envs.lint.scripts]
@@ -184,6 +184,8 @@ ignore = [
 "SIM105",
 #PLR0913 Too many arguments to function call
 "PLR0913",
+# RUF012 Mutable class attributes should be annotated with `typing.ClassVar`
+"RUF012",
 ]
 unfixable = [
   # Don't touch print statements
