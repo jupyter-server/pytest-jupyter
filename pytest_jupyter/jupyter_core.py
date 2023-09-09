@@ -5,6 +5,7 @@ import asyncio
 import json
 import os
 import sys
+import typing
 from pathlib import Path
 
 import jupyter_core
@@ -16,7 +17,7 @@ try:
     import resource
 except ImportError:
     # Windows
-    resource = None  # type: ignore
+    resource = None  # type:ignore[assignment]
 
 
 # Handle resource limit
@@ -52,7 +53,7 @@ def io_loop(jp_asyncio_loop):
     """Override the io_loop for pytest_tornasync.  This is a no-op
     if tornado is not installed."""
 
-    async def get_tornado_loop():
+    async def get_tornado_loop() -> typing.Any:
         """Asynchronously get a tornado loop."""
         try:
             from tornado.ioloop import IOLoop

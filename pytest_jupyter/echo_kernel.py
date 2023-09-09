@@ -1,9 +1,12 @@
 """A simple echo kernel."""
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
+from __future__ import annotations
 
 import logging
+import typing
 
+# mypy: disable-error-code="no-untyped-call"
 from ipykernel.kernelapp import IPKernelApp
 from ipykernel.kernelbase import Kernel
 
@@ -23,8 +26,15 @@ class EchoKernel(Kernel):
     banner = "Echo kernel - as useful as a parrot"
 
     def do_execute(
-        self, code, silent, store_history=True, user_expressions=None, allow_stdin=False
-    ):
+        self,
+        code: str,
+        silent: bool,
+        store_history=True,
+        user_expressions: typing.Any = None,
+        allow_stdin=False,
+        *,
+        cell_id: str | None = None,
+    ) -> dict[str, typing.Any]:
         """Execute code on the kernel."""
         if not silent:
             stream_content = {"name": "stdout", "text": code}

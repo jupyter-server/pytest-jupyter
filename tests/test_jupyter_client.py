@@ -22,6 +22,6 @@ async def test_start_kernel(jp_start_kernel):
 
 
 def test_echo_kernel():
-    kernel = EchoKernel()
+    kernel = EchoKernel()  # type:ignore[no-untyped-call]
     kernel.session = Mock(spec=Session)
     kernel.do_execute("foo", False)

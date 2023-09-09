@@ -9,9 +9,11 @@ try:
     import tornado.testing
     from tornado.simple_httpclient import SimpleAsyncHTTPClient
 except ImportError:
-    SimpleAsyncHTTPClient = object  # type:ignore
+    SimpleAsyncHTTPClient = object  # type:ignore[assignment,misc]
 
 import pytest
+
+# mypy: disable-error-code="no-untyped-call"
 
 
 @pytest.hookimpl(tryfirst=True)

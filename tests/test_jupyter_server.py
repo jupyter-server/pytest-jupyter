@@ -9,6 +9,8 @@ from tornado.websocket import WebSocketHandler
 
 from pytest_jupyter.jupyter_server import _Authorizer
 
+# mypy: ignore-errors
+
 
 async def test_serverapp(jp_serverapp):
     assert isinstance(jp_serverapp, ServerApp)
