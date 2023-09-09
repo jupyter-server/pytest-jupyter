@@ -9,7 +9,7 @@ try:
     import tornado.testing
     from tornado.simple_httpclient import SimpleAsyncHTTPClient
 except ImportError:
-    SimpleAsyncHTTPClient = object  # type:ignore
+    SimpleAsyncHTTPClient = object  # type:ignore[assignment,misc]
 
 import pytest
 
@@ -76,7 +76,7 @@ class AsyncHTTPServerClient(SimpleAsyncHTTPClient):
         Fetch `path` from test server, passing `kwargs` to the `fetch`
         of the underlying `SimpleAsyncHTTPClient`.
         """
-        return super().fetch(self.get_url(path), **kwargs)
+        return super().fetch(self.get_url(path), **kwargs)  # type:ignore[no-untyped-call]
 
     def get_protocol(self):
         """Get the protocol for the client."""
@@ -89,4 +89,6 @@ class AsyncHTTPServerClient(SimpleAsyncHTTPClient):
 
     def get_url(self, path):
         """Get the url for the client."""
-        return f"{self.get_protocol()}://127.0.0.1:{self.get_http_port()}{path}"
+        return (
+            f"{self.get_protocol()}://127.0.0.1:{self.get_http_port()}{path}"
+        )  # type:ignore[no-untyped-call]

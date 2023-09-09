@@ -1,6 +1,7 @@
 """Fixtures for use with jupyter server and downstream."""
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
+from __future__ import annotations
 
 import asyncio
 import importlib
@@ -34,7 +35,7 @@ try:
     is_v2 = version_info[0] == 2  # noqa
 
 except ImportError:
-    Authorizer = object  # type:ignore
+    Authorizer = object  # type:ignore[assignment, misc]
     import warnings
 
     warnings.warn(
@@ -52,7 +53,7 @@ from pytest_jupyter.pytest_tornasync import *  # noqa
 from pytest_jupyter.utils import mkdir
 
 # Override some of the fixtures from pytest_tornasync
-# The io_loop fixture is overidden in jupyter_core.py so it
+# The io_loop fixture is overridden in jupyter_core.py so it
 # can be shared by other plugins that need it (e.g. jupyter_client.py).
 
 
@@ -93,7 +94,7 @@ def jp_server_config():
         }
     else:
         config = {}
-    return Config(config)
+    return Config(config)  # type:ignore[no-untyped-call]
 
 
 @pytest.fixture
@@ -165,7 +166,7 @@ def jp_logging_stream():
 
 @pytest.fixture(scope="function")
 def jp_configurable_serverapp(
-    jp_nbconvert_templates,  # this fixture must preceed jp_environ
+    jp_nbconvert_templates,  # this fixture must precede jp_environ
     jp_environ,
     jp_server_config,
     jp_argv,
@@ -186,10 +187,10 @@ def jp_configurable_serverapp(
     .. code-block:: python
 
       def my_test(jp_configurable_serverapp):
-         app = jp_configurable_serverapp(...)
-         ...
+          app = jp_configurable_serverapp(...)
+          ...
     """
-    ServerApp.clear_instance()
+    ServerApp.clear_instance()  # type:ignore[no-untyped-call]
 
     # Inject jupyter_server_terminals into config unless it was
     # explicitly put in config.
@@ -209,7 +210,7 @@ def jp_configurable_serverapp(
         root_dir=jp_root_dir,
         **kwargs,
     ):
-        c = Config(config)
+        c = Config(config)  # type:ignore[no-untyped-call]
         c.NotebookNotary.db_file = ":memory:"
 
         default_token = hexlify(os.urandom(4)).decode("ascii")
@@ -224,7 +225,7 @@ def jp_configurable_serverapp(
         if root_dir is not None:
             kwargs["root_dir"] = str(root_dir)
 
-        app = ServerApp.instance(
+        app = ServerApp.instance(  # type:ignore[no-untyped-call]
             # Set the log level to debug for testing purposes
             log_level="DEBUG",
             port=jp_http_port,
@@ -246,7 +247,7 @@ def jp_configurable_serverapp(
             async def initialize_app():
                 app.initialize(argv=argv, new_httpserver=False)
 
-            jp_asyncio_loop.run_until_complete(initialize_app())
+            jp_asyncio_loop.run_until_complete(initialize_app())  # type:ignore[no-untyped-call]
         # Reroute all logging StreamHandlers away from stdin/stdout since pytest hijacks
         # these streams and closes them at unfortunate times.
         stream_handlers = [h for h in app.log.handlers if isinstance(h, logging.StreamHandler)]
@@ -306,8 +307,8 @@ def jp_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_base_url):
         if not params:
             params = {}
         # Handle URL strings
-        path_url = url_escape(url_path_join(*parts), plus=False)
-        base_path_url = url_path_join(jp_base_url, path_url)
+        path_url = url_escape(url_path_join(*parts), plus=False)  # type:ignore[no-untyped-call]
+        base_path_url = url_path_join(jp_base_url, path_url)  # type:ignore[no-untyped-call]
         params_url = urllib.parse.urlencode(params)
         url = base_path_url + "?" + params_url
         # Add auth keys to header, if not overridden
@@ -331,17 +332,11 @@ def jp_ws_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_http_port, 
         async def my_test(jp_fetch, jp_ws_fetch):
             # Start a kernel
             r = await jp_fetch(
-                'api', 'kernels',
-                method='POST',
-                body=json.dumps({
-                    'name': "python3"
-                })
+                "api", "kernels", method="POST", body=json.dumps({"name": "python3"})
             )
-            kid = json.loads(r.body.decode())['id']
+            kid = json.loads(r.body.decode())["id"]
             # Open a websocket connection.
-            ws = await jp_ws_fetch(
-                'api', 'kernels', kid, 'channels'
-            )
+            ws = await jp_ws_fetch("api", "kernels", kid, "channels")
             ...
     """
 
@@ -351,8 +346,8 @@ def jp_ws_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_http_port, 
         if not params:
             params = {}
         # Handle URL strings
-        path_url = url_escape(url_path_join(*parts), plus=False)
-        base_path_url = url_path_join(jp_base_url, path_url)
+        path_url = url_escape(url_path_join(*parts), plus=False)  # type:ignore[no-untyped-call]
+        base_path_url = url_path_join(jp_base_url, path_url)  # type:ignore[no-untyped-call]
         urlparts = urllib.parse.urlparse(f"ws://localhost:{jp_http_port}")
         urlparts = urlparts._replace(path=base_path_url, query=urllib.parse.urlencode(params))
         url = urlparts.geturl()
@@ -380,8 +375,8 @@ def jp_create_notebook(jp_root_dir):
         parent = nbpath.parent
         parent.mkdir(parents=True, exist_ok=True)
         # Create a notebook string and write to file.
-        nb = nbformat.v4.new_notebook()
-        nbtext = nbformat.writes(nb, version=4)
+        nb = nbformat.v4.new_notebook()  # type:ignore[no-untyped-call]
+        nbtext = nbformat.writes(nb, version=4)  # type:ignore[no-untyped-call]
         nbpath.write_text(nbtext)
         return nb
 
@@ -392,14 +387,14 @@ def jp_create_notebook(jp_root_dir):
 def jp_server_cleanup(jp_asyncio_loop):
     """Automatically cleans up server resources."""
     yield
-    app: ServerApp = ServerApp.instance()
+    app: ServerApp = ServerApp.instance()  # type:ignore[no-untyped-call]
     try:
-        jp_asyncio_loop.run_until_complete(app._cleanup())
+        jp_asyncio_loop.run_until_complete(app._cleanup())  # type:ignore[no-untyped-call]
     except (RuntimeError, SystemExit) as e:
         print("ignoring cleanup error", e)  # noqa
     if hasattr(app, "kernel_manager"):
         app.kernel_manager.context.destroy()
-    ServerApp.clear_instance()
+    ServerApp.clear_instance()  # type:ignore[no-untyped-call]
 
 
 @pytest.fixture
@@ -452,8 +447,8 @@ class _Authorizer(Authorizer):
     # Set these class attributes from within a test
     # to verify that they match the arguments passed
     # by the REST API.
-    permissions: dict = {}
-    _default_regex_mapping: dict = {}
+    permissions: dict[str, str] = {}
+    _default_regex_mapping: dict[str, str] = {}
 
     HTTP_METHOD_TO_AUTH_ACTION = {
         "GET": "read",
@@ -466,7 +461,9 @@ class _Authorizer(Authorizer):
         "WEBSOCKET": "execute",
     }
 
-    def match_url_to_resource(self, url, regex_mapping=None):
+    def match_url_to_resource(
+        self, url: str, regex_mapping: dict[str, str] | None = None
+    ) -> str | None:
         """Finds the JupyterHandler regex pattern that would
         match the given URL and returns the resource name (str)
         of that handler.
@@ -478,8 +475,9 @@ class _Authorizer(Authorizer):
             pattern = re.compile(regex)
             if pattern.fullmatch(url):
                 return auth_resource
+        return None
 
-    def normalize_url(self, path):
+    def normalize_url(self, path: str) -> str:
         """Drop the base URL and make sure path leads with a /"""
         base_url = self.parent.base_url
         # Remove base_url
