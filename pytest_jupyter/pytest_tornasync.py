@@ -13,6 +13,8 @@ except ImportError:
 
 import pytest
 
+# mypy: disable-error-code="no-untyped-call"
+
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_pycollect_makeitem(collector, name, obj):
@@ -76,7 +78,7 @@ class AsyncHTTPServerClient(SimpleAsyncHTTPClient):
         Fetch `path` from test server, passing `kwargs` to the `fetch`
         of the underlying `SimpleAsyncHTTPClient`.
         """
-        return super().fetch(self.get_url(path), **kwargs)  # type:ignore[no-untyped-call]
+        return super().fetch(self.get_url(path), **kwargs)
 
     def get_protocol(self):
         """Get the protocol for the client."""
@@ -89,6 +91,4 @@ class AsyncHTTPServerClient(SimpleAsyncHTTPClient):
 
     def get_url(self, path):
         """Get the url for the client."""
-        return (
-            f"{self.get_protocol()}://127.0.0.1:{self.get_http_port()}{path}"
-        )  # type:ignore[no-untyped-call]
+        return f"{self.get_protocol()}://127.0.0.1:{self.get_http_port()}{path}"
