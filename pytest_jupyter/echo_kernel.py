@@ -61,7 +61,7 @@ class EchoKernel(Kernel):
 class EchoKernelApp(IPKernelApp):
     """An app for the echo kernel."""
 
-    kernel_class = EchoKernel
+    kernel_class = EchoKernel  # type:ignore[assignment]
 
 
 if __name__ == "__main__":

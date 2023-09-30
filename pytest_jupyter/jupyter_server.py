@@ -94,7 +94,7 @@ def jp_server_config():
         }
     else:
         config = {}
-    return Config(config)  # type:ignore[no-untyped-call]
+    return Config(config)
 
 
 @pytest.fixture
@@ -210,7 +210,7 @@ def jp_configurable_serverapp(
         root_dir=jp_root_dir,
         **kwargs,
     ):
-        c = Config(config)  # type:ignore[no-untyped-call]
+        c = Config(config)
         c.NotebookNotary.db_file = ":memory:"
 
         default_token = hexlify(os.urandom(4)).decode("ascii")
@@ -479,6 +479,9 @@ class _Authorizer(Authorizer):
 
     def normalize_url(self, path: str) -> str:
         """Drop the base URL and make sure path leads with a /"""
+        if not self.parent:
+            msg = "Cannot normalize the url without a parent object"
+            raise ValueError(msg)
         base_url = self.parent.base_url
         # Remove base_url
         if path.startswith(base_url):
