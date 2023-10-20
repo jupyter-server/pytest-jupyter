@@ -307,8 +307,8 @@ def jp_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_base_url):
         if not params:
             params = {}
         # Handle URL strings
-        path_url = url_escape(url_path_join(*parts), plus=False)  # type:ignore[no-untyped-call]
-        base_path_url = url_path_join(jp_base_url, path_url)  # type:ignore[no-untyped-call]
+        path_url = url_escape(url_path_join(*parts), plus=False)
+        base_path_url = url_path_join(jp_base_url, path_url)
         params_url = urllib.parse.urlencode(params)
         url = base_path_url + "?" + params_url
         # Add auth keys to header, if not overridden
@@ -346,8 +346,8 @@ def jp_ws_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_http_port, 
         if not params:
             params = {}
         # Handle URL strings
-        path_url = url_escape(url_path_join(*parts), plus=False)  # type:ignore[no-untyped-call]
-        base_path_url = url_path_join(jp_base_url, path_url)  # type:ignore[no-untyped-call]
+        path_url = url_escape(url_path_join(*parts), plus=False)
+        base_path_url = url_path_join(jp_base_url, path_url)
         urlparts = urllib.parse.urlparse(f"ws://localhost:{jp_http_port}")
         urlparts = urlparts._replace(path=base_path_url, query=urllib.parse.urlencode(params))
         url = urlparts.geturl()
@@ -389,7 +389,7 @@ def jp_server_cleanup(jp_asyncio_loop):
     yield
     app: ServerApp = ServerApp.instance()  # type:ignore[no-untyped-call]
     try:
-        jp_asyncio_loop.run_until_complete(app._cleanup())  # type:ignore[no-untyped-call]
+        jp_asyncio_loop.run_until_complete(app._cleanup())
     except (RuntimeError, SystemExit) as e:
         print("ignoring cleanup error", e)  # noqa
     if hasattr(app, "kernel_manager"):
