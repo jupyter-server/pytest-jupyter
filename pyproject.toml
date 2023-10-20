@@ -91,7 +91,7 @@ nowarn = "test -W default {args}"
 
 [tool.hatch.envs.typing]
 features = ["test", "server", "client"]
-dependencies = ["mypy>=1.5.1"]
+dependencies = ["mypy>=1.6.0"]
 [tool.hatch.envs.typing.scripts]
 test = "mypy --install-types --non-interactive {args:.}"
 
@@ -99,7 +99,7 @@ test = "mypy --install-types --non-interactive {args:.}"
 dependencies = [
   "black[jupyter]==23.3.0",
   "mdformat>0.7",
-  "ruff==0.0.276",
+  "ruff==0.1.1",
 ]
 detached = true
 [tool.hatch.envs.lint.scripts]

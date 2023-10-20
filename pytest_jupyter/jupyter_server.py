@@ -190,7 +190,7 @@ def jp_configurable_serverapp(
           app = jp_configurable_serverapp(...)
           ...
     """
-    ServerApp.clear_instance()  # type:ignore[no-untyped-call]
+    ServerApp.clear_instance()
 
     # Inject jupyter_server_terminals into config unless it was
     # explicitly put in config.
@@ -225,7 +225,7 @@ def jp_configurable_serverapp(
         if root_dir is not None:
             kwargs["root_dir"] = str(root_dir)
 
-        app = ServerApp.instance(  # type:ignore[no-untyped-call]
+        app = ServerApp.instance(
             # Set the log level to debug for testing purposes
             log_level="DEBUG",
             port=jp_http_port,
@@ -236,7 +236,7 @@ def jp_configurable_serverapp(
             allow_root=True,
             **kwargs,
         )
-        app.init_signal = lambda: None
+        app.init_signal = lambda: None  # type:ignore[method-assign]
         app.log.propagate = True
         app.log.handlers = []
         # Initialize app without httpserver
@@ -307,8 +307,8 @@ def jp_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_base_url):
         if not params:
             params = {}
         # Handle URL strings
-        path_url = url_escape(url_path_join(*parts), plus=False)  # type:ignore[no-untyped-call]
-        base_path_url = url_path_join(jp_base_url, path_url)  # type:ignore[no-untyped-call]
+        path_url = url_escape(url_path_join(*parts), plus=False)
+        base_path_url = url_path_join(jp_base_url, path_url)
         params_url = urllib.parse.urlencode(params)
         url = base_path_url + "?" + params_url
         # Add auth keys to header, if not overridden
@@ -346,8 +346,8 @@ def jp_ws_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_http_port, 
         if not params:
             params = {}
         # Handle URL strings
-        path_url = url_escape(url_path_join(*parts), plus=False)  # type:ignore[no-untyped-call]
-        base_path_url = url_path_join(jp_base_url, path_url)  # type:ignore[no-untyped-call]
+        path_url = url_escape(url_path_join(*parts), plus=False)
+        base_path_url = url_path_join(jp_base_url, path_url)
         urlparts = urllib.parse.urlparse(f"ws://localhost:{jp_http_port}")
         urlparts = urlparts._replace(path=base_path_url, query=urllib.parse.urlencode(params))
         url = urlparts.geturl()
@@ -387,14 +387,14 @@ def jp_create_notebook(jp_root_dir):
 def jp_server_cleanup(jp_asyncio_loop):
     """Automatically cleans up server resources."""
     yield
-    app: ServerApp = ServerApp.instance()  # type:ignore[no-untyped-call]
+    app: ServerApp = ServerApp.instance()
     try:
-        jp_asyncio_loop.run_until_complete(app._cleanup())  # type:ignore[no-untyped-call]
+        jp_asyncio_loop.run_until_complete(app._cleanup())
     except (RuntimeError, SystemExit) as e:
         print("ignoring cleanup error", e)  # noqa
     if hasattr(app, "kernel_manager"):
         app.kernel_manager.context.destroy()
-    ServerApp.clear_instance()  # type:ignore[no-untyped-call]
+    ServerApp.clear_instance()
 
 
 @pytest.fixture
