@@ -121,8 +121,7 @@ timeout_method = "thread"
 filterwarnings= [
   # Fail on warnings
   "error",
-  # From jupyter_events
-  "module:jsonschema.RefResolver is deprecated as of:DeprecationWarning",
+  "module:datetime.datetime.utcfromtimestamp:DeprecationWarning:dateutil",
 ]
 
 [tool.coverage.report]
