@@ -121,7 +121,7 @@ timeout_method = "thread"
 filterwarnings= [
   # Fail on warnings
   "error",
-  "module:datetime.datetime.utc:DeprecationWarning:dateutil",
+  "module:datetime.datetime.utc:DeprecationWarning",
 ]
 
 [tool.coverage.report]
