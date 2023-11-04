@@ -1,0 +1,47 @@
+name: Test downstream projects
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+concurrency:
+  group: downstream-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  jupyter_client:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Base Setup
+        uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+
+      - name: Run Test
+        uses: jupyterlab/maintainer-tools/.github/actions/downstream-test@v1
+        with:
+          package_name: jupyter_client
+
+  jupyter_server:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@v1
+      - uses: jupyterlab/maintainer-tools/.github/actions/downstream-test@v1
+        with:
+          package_name: jupyter_server
+
+  downstream_check: # This job does nothing and is only used for the branch protection
+    if: always()
+    needs:
+      - jupyter_server
+      - jupyter_client
+    runs-on: ubuntu-latest
+    steps:
+      - name: Decide whether the needed jobs succeeded or failed
+        uses: re-actors/alls-green@release/v1
+        with:
+          jobs: ${{ toJSON(needs) }}
