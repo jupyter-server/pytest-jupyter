@@ -25,15 +25,15 @@ class EchoKernel(Kernel):
     }
     banner = "Echo kernel - as useful as a parrot"
 
-    def do_execute(
+    def do_execute(  # type:ignore[override]
         self,
         code: str,
         silent: bool,
-        store_history=True,
-        user_expressions: typing.Any = None,
+        store_history=True,  # noqa: ARG002
+        user_expressions: typing.Any = None,  # noqa: ARG002
         allow_stdin=False,
         *,
-        cell_id: str | None = None,
+        cell_id: str | None = None,  # noqa: ARG002
     ) -> dict[str, typing.Any]:
         """Execute code on the kernel."""
         if not silent:

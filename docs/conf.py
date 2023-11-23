@@ -18,7 +18,7 @@
 # -- Project information -----------------------------------------------------
 
 project = "pytest-jupyter"
-copyright = "2020, Project Jupyter"  # noqa
+copyright = "2020, Project Jupyter"
 author = "Project Jupyter"
 
 
@@ -33,7 +33,7 @@ extensions = [
 ]
 
 try:
-    import enchant  # type:ignore[import-not-found]  # noqa
+    import enchant  # type:ignore[import-not-found]  # noqa: F401
 
     extensions += ["sphinxcontrib.spelling"]
 except ImportError:
