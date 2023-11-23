@@ -12,6 +12,7 @@ import re
 import shutil
 import urllib.parse
 from binascii import hexlify
+from pathlib import Path
 
 import jupyter_core.paths
 import pytest
@@ -32,7 +33,7 @@ try:
     from tornado.websocket import WebSocketHandler
     from traitlets.config import Config
 
-    is_v2 = version_info[0] == 2  # noqa
+    is_v2 = version_info[0] == 2
 
 except ImportError:
     Authorizer = object  # type:ignore[assignment, misc]
@@ -48,8 +49,8 @@ except ImportError:
 
 
 # Bring in local plugins.
-from pytest_jupyter.jupyter_core import *  # noqa
-from pytest_jupyter.pytest_tornasync import *  # noqa
+from pytest_jupyter.jupyter_core import *  # noqa: F403
+from pytest_jupyter.pytest_tornasync import *  # noqa: F403
 from pytest_jupyter.utils import mkdir
 
 # Override some of the fixtures from pytest_tornasync
@@ -57,7 +58,7 @@ from pytest_jupyter.utils import mkdir
 # can be shared by other plugins that need it (e.g. jupyter_client.py).
 
 
-@pytest.fixture
+@pytest.fixture()
 def http_server(io_loop, http_server_port, jp_web_app):
     """Start a tornado HTTP server that listens on all available interfaces."""
 
@@ -83,7 +84,7 @@ def http_server(io_loop, http_server_port, jp_web_app):
 # End pytest_tornasync overrides
 
 
-@pytest.fixture
+@pytest.fixture()
 def jp_server_config():
     """Allows tests to setup their specific configuration values."""
     if is_v2:
@@ -97,19 +98,19 @@ def jp_server_config():
     return Config(config)
 
 
-@pytest.fixture
+@pytest.fixture()
 def jp_root_dir(tmp_path):
     """Provides a temporary Jupyter root directory value."""
     return mkdir(tmp_path, "root_dir")
 
 
-@pytest.fixture
+@pytest.fixture()
 def jp_template_dir(tmp_path):
     """Provides a temporary Jupyter templates directory value."""
     return mkdir(tmp_path, "templates")
 
 
-@pytest.fixture
+@pytest.fixture()
 def jp_argv():
     """Allows tests to setup specific argv values."""
     return []
@@ -122,14 +123,14 @@ def jp_http_port(http_server_port):
     http_server_port[0].close()
 
 
-@pytest.fixture
-def jp_extension_environ(jp_env_config_path, monkeypatch):
+@pytest.fixture()
+def jp_extension_environ(jp_env_config_path, monkeypatch):  # noqa: PT004
     """Monkeypatch a Jupyter Extension's config path into each test's environment variable"""
     monkeypatch.setattr(serverextension, "ENV_CONFIG_PATH", [str(jp_env_config_path)])
 
 
-@pytest.fixture
-def jp_nbconvert_templates(jp_data_dir):
+@pytest.fixture()
+def jp_nbconvert_templates(jp_data_dir):  # noqa: PT004
     """Setups up a temporary directory consisting of the nbconvert templates."""
 
     # Get path to nbconvert template directory *before*
@@ -137,7 +138,7 @@ def jp_nbconvert_templates(jp_data_dir):
     possible_paths = jupyter_core.paths.jupyter_path("nbconvert", "templates")
     nbconvert_path = None
     for path in possible_paths:
-        if os.path.exists(path):
+        if Path(path).exists():
             nbconvert_path = path
             break
 
@@ -148,7 +149,7 @@ def jp_nbconvert_templates(jp_data_dir):
         shutil.copytree(nbconvert_path, str(nbconvert_target))
 
 
-@pytest.fixture
+@pytest.fixture()
 def jp_logging_stream():
     """StringIO stream intended to be used by the core
     Jupyter ServerApp logger's default StreamHandler. This
@@ -160,11 +161,11 @@ def jp_logging_stream():
     output = logging_stream.getvalue()
     # If output exists, print it.
     if output:
-        print(output)  # noqa
+        print(output)  # noqa: T201
     return output
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def jp_configurable_serverapp(
     jp_nbconvert_templates,  # this fixture must precede jp_environ
     jp_environ,
@@ -261,19 +262,19 @@ def jp_configurable_serverapp(
     return _configurable_serverapp
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def jp_serverapp(jp_server_config, jp_argv, jp_configurable_serverapp):
     """Starts a Jupyter Server instance based on the established configuration values."""
     return jp_configurable_serverapp(config=jp_server_config, argv=jp_argv)
 
 
-@pytest.fixture
+@pytest.fixture()
 def jp_web_app(jp_serverapp):
     """app fixture is needed by pytest_tornasync plugin"""
     return jp_serverapp.web_app
 
 
-@pytest.fixture
+@pytest.fixture()
 def jp_auth_header(jp_serverapp):
     """Configures an authorization header using the token from the serverapp fixture."""
     if not is_v2:
@@ -281,13 +282,13 @@ def jp_auth_header(jp_serverapp):
     return {"Authorization": f"token {jp_serverapp.identity_provider.token}"}
 
 
-@pytest.fixture
+@pytest.fixture()
 def jp_base_url():
     """Returns the base url to use for the test."""
     return "/a%40b/"
 
 
-@pytest.fixture
+@pytest.fixture()
 def jp_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_base_url):
     """Sends an (asynchronous) HTTP request to a test server.
     The fixture is a factory; it can be called like
@@ -320,7 +321,7 @@ def jp_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_base_url):
     return client_fetch
 
 
-@pytest.fixture
+@pytest.fixture()
 def jp_ws_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_http_port, jp_base_url):
     """Sends a websocket request to a test server.
     The fixture is a factory; it can be called like
@@ -340,7 +341,7 @@ def jp_ws_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_http_port, 
             ...
     """
 
-    def client_fetch(*parts, headers=None, params=None, **kwargs):
+    def client_fetch(*parts, headers=None, params=None, **kwargs):  # noqa: ARG
         if not headers:
             headers = {}
         if not params:
@@ -361,7 +362,7 @@ def jp_ws_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_http_port, 
     return client_fetch
 
 
-@pytest.fixture
+@pytest.fixture()
 def jp_create_notebook(jp_root_dir):
     """Creates a notebook in the test's home directory."""
 
@@ -384,20 +385,20 @@ def jp_create_notebook(jp_root_dir):
 
 
 @pytest.fixture(autouse=True)
-def jp_server_cleanup(jp_asyncio_loop):
+def jp_server_cleanup(jp_asyncio_loop):  # noqa: PT004
     """Automatically cleans up server resources."""
     yield
     app: ServerApp = ServerApp.instance()
     try:
         jp_asyncio_loop.run_until_complete(app._cleanup())
     except (RuntimeError, SystemExit) as e:
-        print("ignoring cleanup error", e)  # noqa
+        print("ignoring cleanup error", e)  # noqa: T201
     if hasattr(app, "kernel_manager"):
         app.kernel_manager.context.destroy()
     ServerApp.clear_instance()
 
 
-@pytest.fixture
+@pytest.fixture()
 def send_request(jp_fetch, jp_ws_fetch):
     """Send to Jupyter Server and return response code."""
 
@@ -418,7 +419,7 @@ def send_request(jp_fetch, jp_ws_fetch):
     return _
 
 
-@pytest.fixture
+@pytest.fixture()
 def jp_server_auth_core_resources():
     """The core auth resources for use with a server."""
     modules = []
@@ -435,7 +436,7 @@ def jp_server_auth_core_resources():
     return resource_map
 
 
-@pytest.fixture
+@pytest.fixture()
 def jp_server_auth_resources(jp_server_auth_core_resources):
     """The auth resources used by the server."""
     return jp_server_auth_core_resources
@@ -491,7 +492,7 @@ class _Authorizer(Authorizer):
             path = "/" + path
         return path
 
-    def is_authorized(self, handler, user, action, resource):
+    def is_authorized(self, handler, user, action, resource):  # noqa: ARG002
         """Test if a request is authorized."""
         # Parse Request
         method = "WEBSOCKET" if isinstance(handler, WebSocketHandler) else handler.request.method
@@ -515,7 +516,7 @@ class _Authorizer(Authorizer):
         )
 
 
-@pytest.fixture
+@pytest.fixture()
 def jp_server_authorizer(jp_server_auth_resources):
     """An authorizer for the server."""
     auth_klass = _Authorizer

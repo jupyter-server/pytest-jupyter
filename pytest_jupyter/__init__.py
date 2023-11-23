@@ -4,4 +4,4 @@
 __all__ = ["__version__"]
 
 from ._version import __version__
-from .jupyter_core import *  # noqa
+from .jupyter_core import *  # noqa: F403

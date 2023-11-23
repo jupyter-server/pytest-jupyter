@@ -21,6 +21,7 @@ def pytest_pycollect_makeitem(collector, name, obj):
     """Custom pytest collection hook."""
     if collector.funcnamefilter(name) and iscoroutinefunction(obj):
         return list(collector._genfunctions(name, obj))
+    return None
 
 
 @pytest.hookimpl(tryfirst=True)
@@ -42,7 +43,7 @@ def pytest_pyfunc_call(pyfuncitem):
     return True
 
 
-@pytest.fixture
+@pytest.fixture()
 def http_server_port():
     """
     Port used by `http_server`.
@@ -50,7 +51,7 @@ def http_server_port():
     return tornado.testing.bind_unused_port()
 
 
-@pytest.fixture
+@pytest.fixture()
 def http_server_client(http_server, io_loop):
     """
     Create an asynchronous HTTP client that can fetch from `http_server`.
@@ -88,6 +89,7 @@ class AsyncHTTPServerClient(SimpleAsyncHTTPClient):
         """Get a port for the client."""
         for sock in self._http_server._sockets.values():
             return sock.getsockname()[1]
+        return None
 
     def get_url(self, path):
         """Get the url for the client."""

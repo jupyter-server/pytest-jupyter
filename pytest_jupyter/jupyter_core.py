@@ -35,7 +35,7 @@ if resource is not None:
     resource.setrlimit(resource.RLIMIT_NOFILE, (soft, hard))
 
 
-@pytest.fixture
+@pytest.fixture()
 def jp_asyncio_loop():
     """Get an asyncio loop."""
     if os.name == "nt":
@@ -65,49 +65,49 @@ def io_loop(jp_asyncio_loop):
     return jp_asyncio_loop.run_until_complete(get_tornado_loop())
 
 
-@pytest.fixture
+@pytest.fixture()
 def jp_home_dir(tmp_path):
     """Provides a temporary HOME directory value."""
     return mkdir(tmp_path, "home")
 
 
-@pytest.fixture
+@pytest.fixture()
 def jp_data_dir(tmp_path):
     """Provides a temporary Jupyter data dir directory value."""
     return mkdir(tmp_path, "data")
 
 
-@pytest.fixture
+@pytest.fixture()
 def jp_config_dir(tmp_path):
     """Provides a temporary Jupyter config dir directory value."""
     return mkdir(tmp_path, "config")
 
 
-@pytest.fixture
+@pytest.fixture()
 def jp_runtime_dir(tmp_path):
     """Provides a temporary Jupyter runtime dir directory value."""
     return mkdir(tmp_path, "runtime")
 
 
-@pytest.fixture
+@pytest.fixture()
 def jp_system_jupyter_path(tmp_path):
     """Provides a temporary Jupyter system path value."""
     return mkdir(tmp_path, "share", "jupyter")
 
 
-@pytest.fixture
+@pytest.fixture()
 def jp_env_jupyter_path(tmp_path):
     """Provides a temporary Jupyter env system path value."""
     return mkdir(tmp_path, "env", "share", "jupyter")
 
 
-@pytest.fixture
+@pytest.fixture()
 def jp_system_config_path(tmp_path):
     """Provides a temporary Jupyter config path value."""
     return mkdir(tmp_path, "etc", "jupyter")
 
 
-@pytest.fixture
+@pytest.fixture()
 def jp_env_config_path(tmp_path):
     """Provides a temporary Jupyter env config path value."""
     return mkdir(tmp_path, "env", "etc", "jupyter")
@@ -119,7 +119,7 @@ def jp_kernel_dir(jp_data_dir):
     return mkdir(jp_data_dir, "kernels")
 
 
-@pytest.fixture
+@pytest.fixture()
 def echo_kernel_spec(jp_kernel_dir):
     """Install a kernel spec for the echo kernel."""
     test_dir = Path(jp_kernel_dir) / "echo"
@@ -131,8 +131,8 @@ def echo_kernel_spec(jp_kernel_dir):
     return str(test_dir)
 
 
-@pytest.fixture
-def jp_environ(
+@pytest.fixture()
+def jp_environ(  # noqa: PT004
     monkeypatch,
     tmp_path,
     jp_home_dir,

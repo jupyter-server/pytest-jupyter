@@ -5,7 +5,7 @@
 import pytest
 
 try:
-    import ipykernel  # noqa
+    import ipykernel  # noqa: F401
     from jupyter_client.kernelspec import NATIVE_KERNEL_NAME
     from jupyter_client.manager import start_new_async_kernel
 except ImportError:
@@ -20,11 +20,11 @@ except ImportError:
     )
 
 # Bring in local plugins.
-from pytest_jupyter.jupyter_core import *  # noqa
-from pytest_jupyter.pytest_tornasync import *  # noqa
+from pytest_jupyter.jupyter_core import *  # noqa: F403
+from pytest_jupyter.pytest_tornasync import *  # noqa: F403
 
 
-@pytest.fixture
+@pytest.fixture()
 def jp_zmq_context():
     """Get a zmq context."""
     import zmq
@@ -34,7 +34,7 @@ def jp_zmq_context():
     ctx.term()
 
 
-@pytest.fixture
+@pytest.fixture()
 def jp_start_kernel(jp_environ, jp_asyncio_loop):
     """Get a function to a kernel and clean up resources when done."""
     kms = []
