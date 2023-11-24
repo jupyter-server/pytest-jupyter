@@ -318,7 +318,9 @@ def jp_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_base_url):
         # Handle timeout
         request_timeout = kwargs.pop("request_timeout", 20)
         # Make request.
-        return http_server_client.fetch(url, headers=headers, request_timeout=request_timeout, **kwargs)
+        return http_server_client.fetch(
+            url, headers=headers, request_timeout=request_timeout, **kwargs
+        )
 
     return client_fetch
 
