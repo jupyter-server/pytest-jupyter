@@ -315,8 +315,10 @@ def jp_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_base_url):
         # Add auth keys to header, if not overridden
         for key, value in jp_auth_header.items():
             headers.setdefault(key, value)
+        # Handle timeout
+        request_timeout = kwargs.pop("request_timeout", 20)
         # Make request.
-        return http_server_client.fetch(url, headers=headers, request_timeout=20, **kwargs)
+        return http_server_client.fetch(url, headers=headers, request_timeout=request_timeout, **kwargs)
 
     return client_fetch
 
