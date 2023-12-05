@@ -2,6 +2,41 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.8.0
+
+([Full Changelog](https://github.com/jupyter-server/pytest-jupyter/compare/v0.7.0...d83a09ba47b003c5bab94bb0a8c7e7bd3cd283f1))
+
+### Enhancements made
+
+- Allow passing request_timeout to client_fetch [#67](https://github.com/jupyter-server/pytest-jupyter/pull/67) ([@afbarbaro](https://github.com/afbarbaro))
+
+### Maintenance and upkeep improvements
+
+- Add missing 0.7.0 changelog entry [#69](https://github.com/jupyter-server/pytest-jupyter/pull/69) ([@blink1073](https://github.com/blink1073))
+- Update ruff and typings [#66](https://github.com/jupyter-server/pytest-jupyter/pull/66) ([@blink1073](https://github.com/blink1073))
+- Clean up lint and add downstream tests [#64](https://github.com/jupyter-server/pytest-jupyter/pull/64) ([@blink1073](https://github.com/blink1073))
+- Use ruff format [#63](https://github.com/jupyter-server/pytest-jupyter/pull/63) ([@blink1073](https://github.com/blink1073))
+- Update ruff and typing [#62](https://github.com/jupyter-server/pytest-jupyter/pull/62) ([@blink1073](https://github.com/blink1073))
+- Update typings for traitlets 5.10.1 [#60](https://github.com/jupyter-server/pytest-jupyter/pull/60) ([@blink1073](https://github.com/blink1073))
+- Adopt sp-repo-review [#58](https://github.com/jupyter-server/pytest-jupyter/pull/58) ([@blink1073](https://github.com/blink1073))
+- Use local coverage [#54](https://github.com/jupyter-server/pytest-jupyter/pull/54) ([@blink1073](https://github.com/blink1073))
+
+### Other merged PRs
+
+- chore: update pre-commit hooks [#68](https://github.com/jupyter-server/pytest-jupyter/pull/68) ([@pre-commit-ci](https://github.com/pre-commit-ci))
+- chore: update pre-commit hooks [#65](https://github.com/jupyter-server/pytest-jupyter/pull/65) ([@pre-commit-ci](https://github.com/pre-commit-ci))
+- chore: update pre-commit hooks [#61](https://github.com/jupyter-server/pytest-jupyter/pull/61) ([@pre-commit-ci](https://github.com/pre-commit-ci))
+- Bump actions/checkout from 3 to 4 [#59](https://github.com/jupyter-server/pytest-jupyter/pull/59) ([@dependabot](https://github.com/dependabot))
+- Update release instructions with additonal commit steps [#52](https://github.com/jupyter-server/pytest-jupyter/pull/52) ([@kevin-bates](https://github.com/kevin-bates))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/pytest-jupyter/graphs/contributors?from=2023-03-30&to=2023-12-05&type=c))
+
+[@afbarbaro](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Aafbarbaro+updated%3A2023-03-30..2023-12-05&type=Issues) | [@blink1073](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Ablink1073+updated%3A2023-03-30..2023-12-05&type=Issues) | [@codecov](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Acodecov+updated%3A2023-03-30..2023-12-05&type=Issues) | [@dependabot](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Adependabot+updated%3A2023-03-30..2023-12-05&type=Issues) | [@kevin-bates](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Akevin-bates+updated%3A2023-03-30..2023-12-05&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Apre-commit-ci+updated%3A2023-03-30..2023-12-05&type=Issues) | [@welcome](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Awelcome+updated%3A2023-03-30..2023-12-05&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.7.0
 
 ## What's Changed
@@ -20,8 +55,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/pytest-jupyter/graphs/contributors?from=2022-12-19&to=2023-03-30&type=c))
 
 ([Full Changelog](https://github.com/jupyter-server/pytest-jupyter/compare/v0.6.2...v0.7.0))
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.6.2
 
