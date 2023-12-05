@@ -2,6 +2,27 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.7.0
+
+## What's Changed
+
+- Add more ci checks by @blink1073 in https://github.com/jupyter-server/pytest-jupyter/pull/42
+- Bump ruff from 0.0.189 to 0.0.194 by @dependabot in https://github.com/jupyter-server/pytest-jupyter/pull/43
+- Bump black\[jupyter\] from 22.10.0 to 22.12.0 by @dependabot in https://github.com/jupyter-server/pytest-jupyter/pull/44
+- Clean up lint by @blink1073 in https://github.com/jupyter-server/pytest-jupyter/pull/45
+- \[pre-commit.ci\] pre-commit autoupdate by @pre-commit-ci in https://github.com/jupyter-server/pytest-jupyter/pull/46
+- Sync lint deps by @blink1073 in https://github.com/jupyter-server/pytest-jupyter/pull/47
+- Add more linting by @blink1073 in https://github.com/jupyter-server/pytest-jupyter/pull/48
+- \[pre-commit.ci\] pre-commit autoupdate by @pre-commit-ci in https://github.com/jupyter-server/pytest-jupyter/pull/49
+- \[pre-commit.ci\] pre-commit autoupdate by @pre-commit-ci in https://github.com/jupyter-server/pytest-jupyter/pull/50
+- Enable header overrides in jp_ws_fetch fixture by @kevin-bates in https://github.com/jupyter-server/pytest-jupyter/pull/51
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/pytest-jupyter/graphs/contributors?from=2022-12-19&to=2023-03-30&type=c))
+
+([Full Changelog](https://github.com/jupyter-server/pytest-jupyter/compare/v0.6.2...v0.7.0))
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.6.2
 
 ([Full Changelog](https://github.com/jupyter-server/pytest-jupyter/compare/v0.6.1...4d3cb820e2ffb435f6b482f1b08bcddce062436d))
@@ -15,8 +36,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/pytest-jupyter/graphs/contributors?from=2022-12-19&to=2022-12-19&type=c))
 
 [@blink1073](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Ablink1073+updated%3A2022-12-19..2022-12-19&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.6.1
 
