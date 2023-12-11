@@ -389,7 +389,7 @@ def jp_create_notebook(jp_root_dir):
     return inner
 
 
-@pytest_asyncio.fixture(autouse=True)
+@pytest_asyncio.fixture()
 async def async_jp_server_cleanup():  # noqa: PT004
     """Automatically cleans up server resources (in an async test)."""
     yield
