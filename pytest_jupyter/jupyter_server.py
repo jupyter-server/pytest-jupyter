@@ -16,6 +16,7 @@ from pathlib import Path
 
 import jupyter_core.paths
 import pytest
+import pytest_asyncio
 
 # The try block is needed so that the documentation can
 # still build without needed to install all the dependencies.
@@ -386,6 +387,20 @@ def jp_create_notebook(jp_root_dir):
         return nb
 
     return inner
+
+
+@pytest_asyncio.fixture(autouse=True)
+async def async_jp_server_cleanup():  # noqa: PT004
+    """Automatically cleans up server resources (in an async test)."""
+    yield
+    app: ServerApp = ServerApp.instance()
+    try:
+        await app._cleanup()
+    except (RuntimeError, SystemExit) as e:
+        print("ignoring cleanup error", e)  # noqa: T201
+    if hasattr(app, "kernel_manager"):
+        app.kernel_manager.context.destroy()
+    ServerApp.clear_instance()
 
 
 @pytest.fixture(autouse=True)
