@@ -49,7 +49,8 @@ server = [
     "jupyter_server>=1.21",
     "jupyter_client>=7.4.0",
     "nbformat>=5.3",
-    "ipykernel>=6.14"
+    "ipykernel>=6.14",
+    "pytest-asyncio",
 ]
 test = [
     "pytest-timeout"

@@ -71,3 +71,8 @@ def test_template_dir(jp_template_dir):
 
 def test_extension_environ(jp_extension_environ):
     pass
+
+
+@pytest.mark.asyncio()
+async def test_async0():
+    pass
