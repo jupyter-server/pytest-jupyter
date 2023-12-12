@@ -27,7 +27,7 @@
 - chore: update pre-commit hooks [#65](https://github.com/jupyter-server/pytest-jupyter/pull/65) ([@pre-commit-ci](https://github.com/pre-commit-ci))
 - chore: update pre-commit hooks [#61](https://github.com/jupyter-server/pytest-jupyter/pull/61) ([@pre-commit-ci](https://github.com/pre-commit-ci))
 - Bump actions/checkout from 3 to 4 [#59](https://github.com/jupyter-server/pytest-jupyter/pull/59) ([@dependabot](https://github.com/dependabot))
-- Update release instructions with additonal commit steps [#52](https://github.com/jupyter-server/pytest-jupyter/pull/52) ([@kevin-bates](https://github.com/kevin-bates))
+- Update release instructions with additional commit steps [#52](https://github.com/jupyter-server/pytest-jupyter/pull/52) ([@kevin-bates](https://github.com/kevin-bates))
 
 ### Contributors to this release
 
