@@ -2,6 +2,7 @@
   https://github.com/eukaryote/pytest-tornasync/blob/9f1bdeec3eb5816e0183f975ca65b5f6f29fbfbb/src/pytest_tornasync/plugin.py
 """
 import asyncio
+import sys
 from contextlib import closing
 
 from jupyter_core.utils import ensure_event_loop
@@ -23,6 +24,8 @@ from pytest_jupyter.jupyter_core import *  # noqa: F403
 @pytest.fixture()
 def jp_asyncio_loop():
     """Get an asyncio loop."""
+    if sys.platform == "win32":
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
     return ensure_event_loop(prefer_selector_loop=True)
 
 
