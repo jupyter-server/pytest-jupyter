@@ -2,7 +2,7 @@ import asyncio
 import os
 import sys
 
-# For backwards compatibility with older versions of client and server.
+# For backwards compatibility with older versions of server.
 if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
