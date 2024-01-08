@@ -3,7 +3,6 @@
 # Distributed under the terms of the Modified BSD License.
 from __future__ import annotations
 
-import asyncio
 import importlib
 import io
 import logging
@@ -52,36 +51,6 @@ except ImportError:
 from pytest_jupyter.jupyter_core import *  # noqa: F403
 from pytest_jupyter.pytest_tornasync import *  # noqa: F403
 from pytest_jupyter.utils import mkdir
-
-# Override some of the fixtures from pytest_tornasync
-# The io_loop fixture is overridden in jupyter_core.py so it
-# can be shared by other plugins that need it (e.g. jupyter_client.py).
-
-
-@pytest.fixture()
-def http_server(io_loop, http_server_port, jp_web_app):
-    """Start a tornado HTTP server that listens on all available interfaces."""
-
-    async def get_server():
-        """Get a server asynchronously."""
-        server = tornado.httpserver.HTTPServer(jp_web_app)
-        server.add_socket(http_server_port[0])
-        return server
-
-    server = io_loop.run_sync(get_server)
-    yield server
-    server.stop()
-
-    if hasattr(server, "close_all_connections"):
-        try:
-            io_loop.run_sync(server.close_all_connections)
-        except asyncio.TimeoutError:
-            pass
-
-    http_server_port[0].close()
-
-
-# End pytest_tornasync overrides
 
 
 @pytest.fixture()
@@ -177,7 +146,6 @@ def jp_configurable_serverapp(
     jp_root_dir,
     jp_logging_stream,
     jp_asyncio_loop,
-    io_loop,
 ):
     """Starts a Jupyter Server instance based on
     the provided configuration values.
@@ -207,7 +175,6 @@ def jp_configurable_serverapp(
         environ=jp_environ,
         http_port=jp_http_port,
         tmp_path=tmp_path,
-        io_loop=io_loop,
         root_dir=jp_root_dir,
         **kwargs,
     ):
@@ -345,7 +312,7 @@ def jp_ws_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_http_port, 
             ...
     """
 
-    def client_fetch(*parts, headers=None, params=None, **kwargs):  # noqa: ARG
+    def client_fetch(*parts, headers=None, params=None, **kwargs):
         if not headers:
             headers = {}
         if not params:
@@ -414,6 +381,7 @@ def send_request(jp_fetch, jp_ws_fetch):
             code = r.code
         except HTTPClientError as err:
             code = err.code
+            print(f"HTTPClientError ({err.code}): {err}")  # noqa: T201
         else:
             if fetch is jp_ws_fetch:
                 r.close()

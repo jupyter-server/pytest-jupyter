@@ -1,8 +1,8 @@
 """Vendored fork of pytest_tornasync from
   https://github.com/eukaryote/pytest-tornasync/blob/9f1bdeec3eb5816e0183f975ca65b5f6f29fbfbb/src/pytest_tornasync/plugin.py
 """
+import asyncio
 from contextlib import closing
-from inspect import iscoroutinefunction
 
 try:
     import tornado.ioloop
@@ -14,33 +14,36 @@ except ImportError:
 import pytest
 
 # mypy: disable-error-code="no-untyped-call"
+# Bring in local plugins.
+from pytest_jupyter.jupyter_core import *  # noqa: F403
 
 
-@pytest.hookimpl(tryfirst=True)
-def pytest_pycollect_makeitem(collector, name, obj):
-    """Custom pytest collection hook."""
-    if collector.funcnamefilter(name) and iscoroutinefunction(obj):
-        return list(collector._genfunctions(name, obj))
-    return None
+@pytest.fixture()
+def io_loop(jp_asyncio_loop):
+    return tornado.ioloop.IOLoop.current()
 
 
-@pytest.hookimpl(tryfirst=True)
-def pytest_pyfunc_call(pyfuncitem):
-    """Custom pytest function call hook."""
-    funcargs = pyfuncitem.funcargs
-    testargs = {arg: funcargs[arg] for arg in pyfuncitem._fixtureinfo.argnames}
+@pytest.fixture()
+def http_server(jp_asyncio_loop, http_server_port, jp_web_app):
+    """Start a tornado HTTP server that listens on all available interfaces."""
 
-    if not iscoroutinefunction(pyfuncitem.obj):
-        pyfuncitem.obj(**testargs)
-        return True
+    async def get_server():
+        """Get a server asynchronously."""
+        server = tornado.httpserver.HTTPServer(jp_web_app)
+        server.add_socket(http_server_port[0])
+        return server
 
-    try:
-        loop = funcargs["io_loop"]
-    except KeyError:
-        loop = tornado.ioloop.IOLoop.current()
+    server = jp_asyncio_loop.run_until_complete(get_server())
+    yield server
+    server.stop()
 
-    loop.run_sync(lambda: pyfuncitem.obj(**testargs))
-    return True
+    if hasattr(server, "close_all_connections"):
+        try:
+            jp_asyncio_loop.run_until_complete(server.close_all_connections())
+        except asyncio.TimeoutError:
+            pass
+
+    http_server_port[0].close()
 
 
 @pytest.fixture()
@@ -52,7 +55,7 @@ def http_server_port():
 
 
 @pytest.fixture()
-def http_server_client(http_server, io_loop):
+def http_server_client(http_server, jp_asyncio_loop):
     """
     Create an asynchronous HTTP client that can fetch from `http_server`.
     """
@@ -61,7 +64,7 @@ def http_server_client(http_server, io_loop):
         """Get a client."""
         return AsyncHTTPServerClient(http_server=http_server)
 
-    client = io_loop.run_sync(get_client)
+    client = jp_asyncio_loop.run_until_complete(get_client())
     with closing(client) as context:
         yield context
 

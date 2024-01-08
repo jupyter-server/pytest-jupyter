@@ -1,15 +1,15 @@
 """Fixtures for use with jupyter core and downstream."""
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
-import asyncio
 import json
 import os
 import sys
-import typing
+from inspect import iscoroutinefunction
 from pathlib import Path
 
 import jupyter_core
 import pytest
+from jupyter_core.utils import ensure_event_loop
 
 from .utils import mkdir
 
@@ -35,34 +35,33 @@ if resource is not None:
     resource.setrlimit(resource.RLIMIT_NOFILE, (soft, hard))
 
 
+@pytest.hookimpl(tryfirst=True)
+def pytest_pycollect_makeitem(collector, name, obj):
+    """Custom pytest collection hook."""
+    if collector.funcnamefilter(name) and iscoroutinefunction(obj):
+        return list(collector._genfunctions(name, obj))
+    return None
+
+
+@pytest.hookimpl(tryfirst=True)
+def pytest_pyfunc_call(pyfuncitem):
+    """Custom pytest function call hook."""
+    funcargs = pyfuncitem.funcargs
+    testargs = {arg: funcargs[arg] for arg in pyfuncitem._fixtureinfo.argnames}
+
+    if not iscoroutinefunction(pyfuncitem.obj):
+        pyfuncitem.obj(**testargs)
+        return True
+
+    loop = ensure_event_loop()
+    loop.run_until_complete(pyfuncitem.obj(**testargs))
+    return True
+
+
 @pytest.fixture()
 def jp_asyncio_loop():
     """Get an asyncio loop."""
-    if os.name == "nt":
-        asyncio.set_event_loop_policy(
-            asyncio.WindowsSelectorEventLoopPolicy()  # type:ignore[attr-defined]
-        )
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    yield loop
-    loop.close()
-
-
-@pytest.fixture(autouse=True)
-def io_loop(jp_asyncio_loop):
-    """Override the io_loop for pytest_tornasync.  This is a no-op
-    if tornado is not installed."""
-
-    async def get_tornado_loop() -> typing.Any:
-        """Asynchronously get a tornado loop."""
-        try:
-            from tornado.ioloop import IOLoop
-
-            return IOLoop.current()
-        except ImportError:
-            pass
-
-    return jp_asyncio_loop.run_until_complete(get_tornado_loop())
+    return ensure_event_loop()
 
 
 @pytest.fixture()
