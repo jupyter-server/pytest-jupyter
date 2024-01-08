@@ -20,6 +20,7 @@ from pytest_jupyter.jupyter_core import *  # noqa: F403
 
 @pytest.fixture()
 def io_loop(jp_asyncio_loop):
+    """Get the current tornado event loop."""
     return tornado.ioloop.IOLoop.current()
 
 
