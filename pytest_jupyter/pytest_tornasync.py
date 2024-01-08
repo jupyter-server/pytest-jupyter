@@ -4,8 +4,6 @@
 import asyncio
 from contextlib import closing
 
-from jupyter_core.utils import ensure_event_loop
-
 try:
     import tornado.ioloop
     import tornado.testing
@@ -18,12 +16,6 @@ import pytest
 # mypy: disable-error-code="no-untyped-call"
 # Bring in local plugins.
 from pytest_jupyter.jupyter_core import *  # noqa: F403
-
-
-@pytest.fixture()
-def jp_asyncio_loop():
-    """Get an asyncio loop."""
-    return ensure_event_loop(prefer_selector_loop=True)
 
 
 @pytest.fixture()

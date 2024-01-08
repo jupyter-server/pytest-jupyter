@@ -35,6 +35,12 @@ if resource is not None:
     resource.setrlimit(resource.RLIMIT_NOFILE, (soft, hard))
 
 
+@pytest.fixture(autouse=True)
+def jp_asyncio_loop():
+    """Get an asyncio loop."""
+    return ensure_event_loop()
+
+
 @pytest.hookimpl(tryfirst=True)
 def pytest_pycollect_makeitem(collector, name, obj):
     """Custom pytest collection hook."""
@@ -53,15 +59,9 @@ def pytest_pyfunc_call(pyfuncitem):
         pyfuncitem.obj(**testargs)
         return True
 
-    loop = ensure_event_loop()
+    loop = ensure_event_loop(prefer_selector_loop=True)
     loop.run_until_complete(pyfuncitem.obj(**testargs))
     return True
-
-
-@pytest.fixture()
-def jp_asyncio_loop():
-    """Get an asyncio loop."""
-    return ensure_event_loop()
 
 
 @pytest.fixture()
