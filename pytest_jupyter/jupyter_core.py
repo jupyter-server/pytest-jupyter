@@ -38,7 +38,9 @@ if resource is not None:
 @pytest.fixture(autouse=True)
 def jp_asyncio_loop():
     """Get an asyncio loop."""
-    return ensure_event_loop(prefer_selector_loop=True)
+    loop = ensure_event_loop(prefer_selector_loop=True)
+    yield loop
+    loop.close()
 
 
 @pytest.hookimpl(tryfirst=True)
