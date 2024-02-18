@@ -41,7 +41,7 @@ docs = [
     "sphinxcontrib-spelling"
 ]
 client = [
-    "jupyter_client>=7.4.0",
+    "jupyter_client @ file:///Users/silvester/workspace/jupyter_client",
     "nbformat>=5.3",
     "ipykernel>=6.14"
 ]
@@ -60,6 +60,9 @@ Homepage = "http://jupyter.org"
 Funding = "https://numfocus.org/donate"
 Source = "https://github.com/jupyter-server/pytest-jupyter"
 Tracker = "https://github.com/jupyter-server/pytest-jupyter/issues"
+
+[tool.hatch.metadata]
+allow-direct-references = true
 
 [tool.hatch.version]
 path = "pytest_jupyter/_version.py"
