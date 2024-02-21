@@ -2,6 +2,28 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.9.0
+
+([Full Changelog](https://github.com/jupyter-server/pytest-jupyter/compare/v0.8.0...ecbb00c30aa753b9d114c33a06042c5409c0e08e))
+
+### Enhancements made
+
+- Update event loop handling [#75](https://github.com/jupyter-server/pytest-jupyter/pull/75) ([@blink1073](https://github.com/blink1073))
+
+### Other merged PRs
+
+- chore: update pre-commit hooks [#76](https://github.com/jupyter-server/pytest-jupyter/pull/76) ([@pre-commit-ci](https://github.com/pre-commit-ci))
+- chore: update pre-commit hooks [#74](https://github.com/jupyter-server/pytest-jupyter/pull/74) ([@pre-commit-ci](https://github.com/pre-commit-ci))
+- Fix typo [#73](https://github.com/jupyter-server/pytest-jupyter/pull/73) ([@davidbrochart](https://github.com/davidbrochart))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/pytest-jupyter/graphs/contributors?from=2023-12-05&to=2024-02-21&type=c))
+
+[@blink1073](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Ablink1073+updated%3A2023-12-05..2024-02-21&type=Issues) | [@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Adavidbrochart+updated%3A2023-12-05..2024-02-21&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Apre-commit-ci+updated%3A2023-12-05..2024-02-21&type=Issues) | [@welcome](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Awelcome+updated%3A2023-12-05..2024-02-21&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.8.0
 
 ([Full Changelog](https://github.com/jupyter-server/pytest-jupyter/compare/v0.7.0...d83a09ba47b003c5bab94bb0a8c7e7bd3cd283f1))
@@ -34,8 +56,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/pytest-jupyter/graphs/contributors?from=2023-03-30&to=2023-12-05&type=c))
 
 [@afbarbaro](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Aafbarbaro+updated%3A2023-03-30..2023-12-05&type=Issues) | [@blink1073](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Ablink1073+updated%3A2023-03-30..2023-12-05&type=Issues) | [@codecov](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Acodecov+updated%3A2023-03-30..2023-12-05&type=Issues) | [@dependabot](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Adependabot+updated%3A2023-03-30..2023-12-05&type=Issues) | [@kevin-bates](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Akevin-bates+updated%3A2023-03-30..2023-12-05&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Apre-commit-ci+updated%3A2023-03-30..2023-12-05&type=Issues) | [@welcome](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Awelcome+updated%3A2023-03-30..2023-12-05&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.7.0
 
