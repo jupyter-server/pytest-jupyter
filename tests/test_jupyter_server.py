@@ -71,3 +71,7 @@ def test_template_dir(jp_template_dir):
 
 def test_extension_environ(jp_extension_environ):
     pass
+
+
+def test_ioloop_fixture(io_loop):
+    pass

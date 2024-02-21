@@ -21,7 +21,6 @@ except ImportError:
 
 # Bring in local plugins.
 from pytest_jupyter.jupyter_core import *  # noqa: F403
-from pytest_jupyter.pytest_tornasync import *  # noqa: F403
 
 
 @pytest.fixture()
