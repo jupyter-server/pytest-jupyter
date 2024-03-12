@@ -2,6 +2,22 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.9.1
+
+([Full Changelog](https://github.com/jupyter-server/pytest-jupyter/compare/v0.9.0...615720a8851595b4710136b859f2e7be4fe3d81d))
+
+### Maintenance and upkeep improvements
+
+- Update Release Scripts [#77](https://github.com/jupyter-server/pytest-jupyter/pull/77) ([@blink1073](https://github.com/blink1073))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/pytest-jupyter/graphs/contributors?from=2024-02-21&to=2024-03-12&type=c))
+
+[@blink1073](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Ablink1073+updated%3A2024-02-21..2024-03-12&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.9.0
 
 ([Full Changelog](https://github.com/jupyter-server/pytest-jupyter/compare/v0.8.0...ecbb00c30aa753b9d114c33a06042c5409c0e08e))
@@ -21,8 +37,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/pytest-jupyter/graphs/contributors?from=2023-12-05&to=2024-02-21&type=c))
 
 [@blink1073](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Ablink1073+updated%3A2023-12-05..2024-02-21&type=Issues) | [@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Adavidbrochart+updated%3A2023-12-05..2024-02-21&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Apre-commit-ci+updated%3A2023-12-05..2024-02-21&type=Issues) | [@welcome](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Awelcome+updated%3A2023-12-05..2024-02-21&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.8.0
 
