@@ -328,7 +328,7 @@ def jp_ws_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_http_port, 
             headers.setdefault(key, value)
         # Make request.
         req = tornado.httpclient.HTTPRequest(url, headers=headers, connect_timeout=120)
-        return tornado.websocket.websocket_connect(req)
+        return tornado.websocket.websocket_connect(req, **kwargs)
 
     return client_fetch
 
