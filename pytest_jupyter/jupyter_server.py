@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import importlib
+import inspect
 import io
 import logging
 import os
@@ -328,6 +329,10 @@ def jp_ws_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_http_port, 
             headers.setdefault(key, value)
         # Make request.
         req = tornado.httpclient.HTTPRequest(url, headers=headers, connect_timeout=120)
+        allowed = list(inspect.signature(tornado.websocket.websocket_connect).parameters)
+        for name in list(kwargs):
+            if name not in allowed:
+                del kwargs[name]
         return tornado.websocket.websocket_connect(req, **kwargs)
 
     return client_fetch
