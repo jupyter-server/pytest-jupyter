@@ -27,7 +27,7 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 dependencies = [
-    "pytest",
+    "pytest>=7.0",
     "jupyter_core>=5.7"
 ]
 requires-python = ">=3.8"
