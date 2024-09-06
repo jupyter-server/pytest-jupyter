@@ -197,7 +197,7 @@ def jp_configurable_serverapp(
         app = ServerApp.instance(
             # Set the log level to debug for testing purposes
             log_level="DEBUG",
-            port=jp_http_port,
+            port=http_port,
             port_retries=0,
             open_browser=False,
             base_url=base_url,
