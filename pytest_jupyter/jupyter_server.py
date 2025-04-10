@@ -268,6 +268,25 @@ def jp_fetch(jp_serverapp, http_server_client, jp_auth_header, jp_base_url):
         async def my_test(jp_fetch):
             response = await jp_fetch("api", "spec.yaml")
             ...
+
+    With query parameters:
+
+    .. code-block:: python
+
+        async def my_test(jp_fetch):
+            response = await jp_fetch("api", "spec.yaml", params={"parameter": "value"})
+            ...
+
+    A POST request with data:
+
+    .. code-block:: python
+
+        async def my_test(jp_fetch):
+            response = await jp_fetch(
+                "api", "spec.yaml", method="POST", body=json.dumps({"parameter": "value"})
+            )
+            ...
+
     """
 
     def client_fetch(*parts, headers=None, params=None, **kwargs):
