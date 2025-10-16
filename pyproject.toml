@@ -30,7 +30,7 @@ dependencies = [
     "pytest>=7.0",
     "jupyter_core>=5.7"
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 
 
 [project.optional-dependencies]
@@ -100,7 +100,7 @@ dependencies = ["pre-commit"]
 detached = true
 [tool.hatch.envs.lint.scripts]
 build = [
-    "pre-commit run --all-files ruff",
+    "pre-commit run --all-files ruff-check",
     "pre-commit run --all-files ruff-format"
 ]
 
@@ -125,6 +125,7 @@ filterwarnings= [
   # Fail on warnings
   "error",
   "module:datetime.datetime.utc:DeprecationWarning",
+  "ignore:.*asyncio.DefaultEventLoopPolicy.*:DeprecationWarning"
 ]
 
 [tool.coverage.report]
@@ -147,7 +148,7 @@ source = ["pytest_jupyter"]
 
 [tool.mypy]
 files = "pytest_jupyter"
-python_version = "3.8"
+python_version = "3.10"
 strict = true
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 disable_error_code = ["no-untyped-def"]

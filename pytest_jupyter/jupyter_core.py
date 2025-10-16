@@ -1,9 +1,11 @@
 """Fixtures for use with jupyter core and downstream."""
+
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 import json
 import os
 import sys
+import warnings
 from inspect import iscoroutinefunction
 from pathlib import Path
 
@@ -38,7 +40,13 @@ if resource is not None:
 @pytest.fixture(autouse=True)
 def jp_asyncio_loop():
     """Get an asyncio loop."""
-    loop = ensure_event_loop(prefer_selector_loop=True)
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "ignore",
+            message=".*WindowsSelectorEventLoopPolicy.*",
+            category=DeprecationWarning,
+        )
+        loop = ensure_event_loop(prefer_selector_loop=True)
     yield loop
     loop.close()
 
@@ -61,79 +69,91 @@ def pytest_pyfunc_call(pyfuncitem):
         pyfuncitem.obj(**testargs)
         return True
 
-    loop = ensure_event_loop(prefer_selector_loop=True)
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "ignore",
+            message=".*WindowsSelectorEventLoopPolicy.*",
+            category=DeprecationWarning,
+        )
+        loop = ensure_event_loop(prefer_selector_loop=True)
     loop.run_until_complete(pyfuncitem.obj(**testargs))
     return True
 
 
-@pytest.fixture()
+@pytest.fixture
 def jp_home_dir(tmp_path):
     """Provides a temporary HOME directory value."""
     return mkdir(tmp_path, "home")
 
 
-@pytest.fixture()
+@pytest.fixture
 def jp_data_dir(tmp_path):
     """Provides a temporary Jupyter data dir directory value."""
     return mkdir(tmp_path, "data")
 
 
-@pytest.fixture()
+@pytest.fixture
 def jp_config_dir(tmp_path):
     """Provides a temporary Jupyter config dir directory value."""
     return mkdir(tmp_path, "config")
 
 
-@pytest.fixture()
+@pytest.fixture
 def jp_runtime_dir(tmp_path):
     """Provides a temporary Jupyter runtime dir directory value."""
     return mkdir(tmp_path, "runtime")
 
 
-@pytest.fixture()
+@pytest.fixture
 def jp_system_jupyter_path(tmp_path):
     """Provides a temporary Jupyter system path value."""
     return mkdir(tmp_path, "share", "jupyter")
 
 
-@pytest.fixture()
+@pytest.fixture
 def jp_env_jupyter_path(tmp_path):
     """Provides a temporary Jupyter env system path value."""
     return mkdir(tmp_path, "env", "share", "jupyter")
 
 
-@pytest.fixture()
+@pytest.fixture
 def jp_system_config_path(tmp_path):
     """Provides a temporary Jupyter config path value."""
     return mkdir(tmp_path, "etc", "jupyter")
 
 
-@pytest.fixture()
+@pytest.fixture
 def jp_env_config_path(tmp_path):
     """Provides a temporary Jupyter env config path value."""
     return mkdir(tmp_path, "env", "etc", "jupyter")
 
 
-@pytest.fixture()
+@pytest.fixture
 def jp_kernel_dir(jp_data_dir):
     """Get the directory for kernel specs."""
     return mkdir(jp_data_dir, "kernels")
 
 
-@pytest.fixture()
+@pytest.fixture
 def echo_kernel_spec(jp_kernel_dir):
     """Install a kernel spec for the echo kernel."""
     test_dir = Path(jp_kernel_dir) / "echo"
     test_dir.mkdir(parents=True, exist_ok=True)
-    argv = [sys.executable, "-m", "pytest_jupyter.echo_kernel", "-f", "{connection_file}"]
+    argv = [
+        sys.executable,
+        "-m",
+        "pytest_jupyter.echo_kernel",
+        "-f",
+        "{connection_file}",
+    ]
     kernel_data = {"argv": argv, "display_name": "echo", "language": "echo"}
     spec_file_path = Path(test_dir / "kernel.json")
     spec_file_path.write_text(json.dumps(kernel_data), "utf8")
     return str(test_dir)
 
 
-@pytest.fixture()
-def jp_environ(  # noqa: PT004
+@pytest.fixture
+def jp_environ(
     monkeypatch,
     tmp_path,
     jp_home_dir,

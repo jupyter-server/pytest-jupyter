@@ -1,4 +1,5 @@
 """A simple echo kernel."""
+
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 from __future__ import annotations
@@ -61,7 +62,7 @@ class EchoKernel(Kernel):
 class EchoKernelApp(IPKernelApp):
     """An app for the echo kernel."""
 
-    kernel_class = EchoKernel  # type:ignore[assignment]
+    kernel_class = EchoKernel
 
 
 if __name__ == "__main__":

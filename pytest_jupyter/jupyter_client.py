@@ -23,17 +23,17 @@ except ImportError:
 from pytest_jupyter.jupyter_core import *  # noqa: F403
 
 
-@pytest.fixture()
+@pytest.fixture
 def jp_zmq_context():
     """Get a zmq context."""
-    import zmq
+    import zmq  # noqa: PLC0415
 
     ctx = zmq.asyncio.Context()
     yield ctx
     ctx.term()
 
 
-@pytest.fixture()
+@pytest.fixture
 def jp_start_kernel(jp_environ, jp_asyncio_loop):
     """Get a function to a kernel and clean up resources when done."""
     kms = []

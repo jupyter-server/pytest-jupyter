@@ -1,6 +1,7 @@
 """Vendored fork of pytest_tornasync from
-  https://github.com/eukaryote/pytest-tornasync/blob/9f1bdeec3eb5816e0183f975ca65b5f6f29fbfbb/src/pytest_tornasync/plugin.py
+https://github.com/eukaryote/pytest-tornasync/blob/9f1bdeec3eb5816e0183f975ca65b5f6f29fbfbb/src/pytest_tornasync/plugin.py
 """
+
 import asyncio
 from contextlib import closing
 
@@ -18,13 +19,13 @@ import pytest
 from pytest_jupyter.jupyter_core import *  # noqa: F403
 
 
-@pytest.fixture()
+@pytest.fixture
 def io_loop(jp_asyncio_loop):
     """Get the current tornado event loop."""
     return tornado.ioloop.IOLoop.current()
 
 
-@pytest.fixture()
+@pytest.fixture
 def http_server(jp_asyncio_loop, http_server_port, jp_web_app):
     """Start a tornado HTTP server that listens on all available interfaces."""
 
@@ -47,7 +48,7 @@ def http_server(jp_asyncio_loop, http_server_port, jp_web_app):
     http_server_port[0].close()
 
 
-@pytest.fixture()
+@pytest.fixture
 def http_server_port():
     """
     Port used by `http_server`.
@@ -55,7 +56,7 @@ def http_server_port():
     return tornado.testing.bind_unused_port()
 
 
-@pytest.fixture()
+@pytest.fixture
 def http_server_client(http_server, jp_asyncio_loop):
     """
     Create an asynchronous HTTP client that can fetch from `http_server`.
@@ -73,12 +74,12 @@ def http_server_client(http_server, jp_asyncio_loop):
 class AsyncHTTPServerClient(SimpleAsyncHTTPClient):
     """An async http server client."""
 
-    def initialize(self, *, http_server=None):
+    def initialize(self, *, http_server=None):  # type: ignore[override]
         """Initialize the client."""
         super().initialize()
         self._http_server = http_server
 
-    def fetch(self, path, **kwargs):
+    def fetch(self, path, **kwargs):  # type: ignore[override]
         """
         Fetch `path` from test server, passing `kwargs` to the `fetch`
         of the underlying `SimpleAsyncHTTPClient`.

@@ -17,14 +17,12 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: ["3.8", "3.12"]
+        python-version: ["3.9", "3.13", "3.14", "3.14t"]
         include:
           - os: windows-latest
             python-version: "3.9"
           - os: ubuntu-latest
             python-version: "pypy-3.9"
-          - os: ubuntu-latest
-            python-version: "3.8"
           - os: macos-latest
             python-version: "3.10"
     steps:
@@ -33,10 +31,10 @@ jobs:
       - name: Run the tests on pypy
         if: ${{ startsWith(matrix.python-version, 'pypy') }}
         run: |
-          hatch run test:nowarn || hatch run test:nowarn --lf
+          hatch run test:nowarn
       - name: Run the tests
         if: ${{ !startsWith(matrix.python-version, 'pypy') }}
-        run: hatch run cov:test || hatch run test:test --lf
+        run: hatch run cov:test
       - uses: jupyterlab/maintainer-tools/.github/actions/upload-coverage@v1
 
   coverage:
@@ -82,7 +80,7 @@ jobs:
           dependency_type: minimum
       - name: Run the unit tests
         run: |
-          hatch -v run test:nowarn || hatch run test:nowarn --lf
+          hatch -v run test:nowarn
 
   test_prereleases:
     name: Test Prereleases
@@ -95,7 +93,7 @@ jobs:
           dependency_type: pre
       - name: Run the tests
         run: |
-          hatch run test:nowarn || hatch run test:nowarn --lf
+          hatch run test:nowarn
 
   make_sdist:
     name: Make SDist
