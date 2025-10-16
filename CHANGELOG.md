@@ -2,6 +2,24 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.11.0
+
+([Full Changelog](https://github.com/jupyter-server/pytest-jupyter/compare/v0.10.1...b7214a010fcb20f220614b011b805f6f91619fa0))
+
+### Merged PRs
+
+- Drop 3.8, Start testing on 3.13, 3.14 and 3.14t, update precommit [#84](https://github.com/jupyter-server/pytest-jupyter/pull/84) ([@Carreau](https://github.com/Carreau))
+- Improved doc string for jp_fetch to include how to provide query parameters in GET and json data in POST [#83](https://github.com/jupyter-server/pytest-jupyter/pull/83) ([@0Hughman0](https://github.com/0Hughman0))
+- Restore the ability to override a serverapp's HTTP port [#82](https://github.com/jupyter-server/pytest-jupyter/pull/82) ([@ojarjur](https://github.com/ojarjur))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/pytest-jupyter/graphs/contributors?from=2024-04-04&to=2025-10-16&type=c))
+
+[@0Hughman0](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3A0Hughman0+updated%3A2024-04-04..2025-10-16&type=Issues) | [@Carreau](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3ACarreau+updated%3A2024-04-04..2025-10-16&type=Issues) | [@ojarjur](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Aojarjur+updated%3A2024-04-04..2025-10-16&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.10.1
 
 ([Full Changelog](https://github.com/jupyter-server/pytest-jupyter/compare/v0.10.0...2211d1c87b89cba467b710d40dabfc85103eb481))
@@ -19,8 +37,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/pytest-jupyter/graphs/contributors?from=2024-04-03&to=2024-04-04&type=c))
 
 [@blink1073](https://github.com/search?q=repo%3Ajupyter-server%2Fpytest-jupyter+involves%3Ablink1073+updated%3A2024-04-03..2024-04-04&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.10.0
 
